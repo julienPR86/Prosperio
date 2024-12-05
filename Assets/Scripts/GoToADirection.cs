@@ -8,7 +8,6 @@ public class GoToADirection : MonoBehaviour
     public Transform Path1;
     public float speed = 5f;
     private Vector3 startPosition;
-    public TextMeshProUGUI text;
 
     void Update()
     {
