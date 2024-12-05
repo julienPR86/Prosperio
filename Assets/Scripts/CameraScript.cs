@@ -1,9 +1,9 @@
-using System;
-using Unity.VisualScripting;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerScript : MonoBehaviour
+public class CameraScript : MonoBehaviour
 {
     private InputController _inputs;
     private InputAction _move;
