@@ -3,9 +3,9 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-/*public class PlayerScript : MonoBehaviour
+public class PlayerScript : MonoBehaviour
 {
-    private InputSystem_Actions _inputs;
+    private InputController _inputs;
     private InputAction _move;
     private InputAction _mouse;
     Vector2 movementVector = new(0,0);
@@ -14,13 +14,13 @@ using UnityEngine.InputSystem;
 
     void Awake()
     {
-        _inputs = new InputSystem_Actions();
+        _inputs = new InputController();
     }
     void OnEnable()
     {
         _inputs.Enable();
         _move = _inputs.Player.Move;
-        _mouse = _inputs.Player.Mouse;
+        _mouse = _inputs.Mouse.Position;
     }
     void OnDisable()
     {
@@ -66,4 +66,3 @@ using UnityEngine.InputSystem;
         return movement;
     }
 }
-*/
