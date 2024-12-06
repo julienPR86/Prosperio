@@ -1,13 +1,16 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 
 public class Person
 {
     private int age { get; set; }
-    private Job job {  get; set; }
+    public Job job {  get; set; }
     private bool isTired { get; set; }
 
-    public Person(int age = 1, Job job = Job.Wanderer, bool isTired = false)
+    private GameObject personobject;
+
+    public Person(Job job = Job.Wanderer, int age = 1, bool isTired = false)
     {
         this.age = age;
         this.job = job;
@@ -22,4 +25,5 @@ public class Person
         Digger,
         Mason
     }
+
 }
