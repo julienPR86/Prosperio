@@ -12,6 +12,9 @@ public class CameraScript : MonoBehaviour
     private int _borderSize = 50;
     private int _navigationSpeed = 1;
 
+    private int _x_limit = 1920;
+    private int _y_limit = 1080;
+
     void Awake()
     {
         _inputs = new InputController();
@@ -33,10 +36,25 @@ public class CameraScript : MonoBehaviour
 
     void Update()
     {
-        Vector2 mousePosition = _mouse.ReadValue<Vector2>();
         movementVector = _move.ReadValue<Vector2>();
-        movementVector += MouseMovement(mousePosition);
-        transform.position += new Vector3(movementVector.x*_navigationSpeed*Time.deltaTime, 0, movementVector.y*_navigationSpeed*Time.deltaTime);
+        movementVector += SideMovement(_mouse.ReadValue<Vector2>());
+        transform.position += new Vector3(movementVector.x*_navigationSpeed*Time.deltaTime, movementVector.y*_navigationSpeed*Time.deltaTime, 0);
+        if (transform.position.x < 0)
+        {
+            transform.position = new(0, transform.position.y, 0);
+        }
+        else if (transform.position.x > _x_limit)
+        {
+            transform.position = new(_x_limit, transform.position.y, 0);
+        }
+        if (transform.position.y < 0)
+        {
+            transform.position = new(transform.position.x, 0, 0);
+        }
+        else if (transform.position.y > _y_limit)
+        {
+            transform.position = new(transform.position.x, _y_limit, 0);
+        }
     }
 
     /// <summary>
@@ -44,7 +62,7 @@ public class CameraScript : MonoBehaviour
     /// </summary>
     /// <param name="mousePosition">The mouse position</param>
     /// <returns>Return a right, left, up or down Vector2</returns>
-    private Vector2 MouseMovement(Vector2 mousePosition)
+    private Vector2 SideMovement(Vector2 mousePosition)
     {
         Vector2 movement = new(0,0);
         if (mousePosition.x < 0 + _borderSize)
