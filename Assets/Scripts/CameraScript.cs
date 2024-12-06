@@ -6,16 +6,18 @@ using UnityEngine.InputSystem;
 
 public class CameraScript : MonoBehaviour
 {
+    [SerializeField]
+    private GridManager _grid;
     private Camera _camera;
     private InputController _inputs;
     private InputAction _move;
     private InputAction _mouse;
     Vector2 movementVector = new(0,0);
     private int _borderSize = 50;
-    private int _navigationSpeed = 1;
+    private int _navigationSpeed = 10;
     private float _cameraSize;
     private Vector2 _limitOffset;
-    private Vector2 _limits = new(1920, 1080);
+    private Vector2 _limits;
 
     void Awake()
     {
@@ -35,9 +37,8 @@ public class CameraScript : MonoBehaviour
     {
         _camera = GetComponent<Camera>();
         _cameraSize = _camera.orthographicSize;
-        float y =_cameraSize;
-        float x = _cameraSize*Screen.width/Screen.height;
-        _limitOffset.Set(x, y);
+        _limitOffset.Set(_cameraSize, _cameraSize*Screen.width/Screen.height);
+        _limits = new(_grid.width,_grid.height);
     }
 
     void Update()
@@ -47,7 +48,7 @@ public class CameraScript : MonoBehaviour
         movementVector += SideMovement(_mouse.ReadValue<Vector2>());
         transform.position += new Vector3(movementVector.x*_navigationSpeed*Time.deltaTime, movementVector.y*_navigationSpeed*Time.deltaTime, 0);
         //check if the camera is out of the map based on the map and camera size
-        if (transform.position.x < 0 + _limitOffset.x)
+        if (transform.position.x < _limitOffset.x)
         {
             transform.position = new(_limitOffset.x, transform.position.y, transform.position.z);
         }
@@ -55,7 +56,7 @@ public class CameraScript : MonoBehaviour
         {
             transform.position = new(_limits.x - _limitOffset.x, transform.position.y, transform.position.z);
         }
-        if (transform.position.y < 0 + _limitOffset.y)
+        if (transform.position.y < _limitOffset.y)
         {
             transform.position = new(transform.position.x, _limitOffset.y, transform.position.z);
         }
