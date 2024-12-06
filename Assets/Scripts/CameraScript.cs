@@ -36,9 +36,11 @@ public class CameraScript : MonoBehaviour
 
     void Update()
     {
+        //apply the camera movements
         movementVector = _move.ReadValue<Vector2>();
         movementVector += SideMovement(_mouse.ReadValue<Vector2>());
         transform.position += new Vector3(movementVector.x*_navigationSpeed*Time.deltaTime, movementVector.y*_navigationSpeed*Time.deltaTime, 0);
+        //check if the camera is out of the map
         if (transform.position.x < 0)
         {
             transform.position = new(0, transform.position.y, 0);
