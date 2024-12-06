@@ -5,8 +5,8 @@ using static Cell;
 public class GridManager : MonoBehaviour
 {
     //Grid dimensions
-    [SerializeField] private int width = 20;
-    [SerializeField] private int height = 20;
+    public int width;
+    public int height;
 
     //Tilemap reference
     [SerializeField] Tilemap tilemap;
