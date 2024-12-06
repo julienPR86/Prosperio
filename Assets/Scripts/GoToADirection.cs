@@ -8,20 +8,26 @@ public class GoToADirection : MonoBehaviour
     public Transform Path1;
     public float speed = 5f;
     private Vector3 startPosition;
+    public GameObject ManagementScripts;
+    private GridManager gridManager;
 
+    private void Start()
+    {
+        gridManager = ManagementScripts.GetComponent<GridManager>();
+    }
     void Update()
     {
-        GoHere(Path1.transform);
+        GoHere(gridManager.cells[5,5].WorldPosition);
     }
 
-    public void GoHere(Transform location)
+    public void GoHere(Vector3 location)
     {
         startPosition = transform.position;
-        Vector3 direction = (location.position - transform.position).normalized;
+        Vector3 direction = (location - transform.position).normalized;
 
         transform.position += direction * speed * Time.deltaTime;
 
-        if (transform.position == location.position) 
+        if (transform.position == location) 
         {
             Debug.Log("Arrived");
         }

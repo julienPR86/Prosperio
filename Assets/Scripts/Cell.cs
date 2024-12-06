@@ -5,11 +5,13 @@ public class Cell
     //attributs
     public int x { get; set; }
     public int y { get; set; }
+
+    public Vector3 WorldPosition;
     public bool buildable { get; set; }
     public TypeOfTerrain typeOfTerrain { get; set; }
 
     //constructeur
-    public Cell(int x, int y, TypeOfTerrain typeOfTerrain)
+    public Cell(int x, int y, TypeOfTerrain typeOfTerrain, Vector3 worldPosition)
     {
         this.x = x;
         this.y = y;
@@ -17,6 +19,7 @@ public class Cell
 
         //buildable only if plains
         this.buildable = (typeOfTerrain == TypeOfTerrain.Plains);
+        WorldPosition = worldPosition;
     }
 
 

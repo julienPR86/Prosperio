@@ -12,7 +12,7 @@ public class GridManager : MonoBehaviour
     [SerializeField] Tilemap tilemap;
 
     //Cells grid
-    Cell[,] cells;
+    public Cell[,] cells;
 
     //tile sprite references
     [SerializeField] RuleTile plainTile, forestTile, stoneTile, berriesTile;
@@ -61,9 +61,15 @@ public class GridManager : MonoBehaviour
                 {
                     typeOfTerrain = TypeOfTerrain.Stone;
                 }
-                //---------------------------------------
 
-                cells[x, y] = new Cell(x, y, typeOfTerrain);
+                Vector3Int cellPosition = new Vector3Int(x, y, 0);
+                Vector3 cellnotcentered = tilemap.CellToWorld(cellPosition);
+                Vector3 tileCentered = new Vector3(tilemap.cellSize.x / 2, tilemap.cellSize.y / 2, 0); // Permet de référencer le milieu de la cellule
+                Vector3 worldPosition = cellnotcentered + tileCentered;
+
+                //--------------------------------------
+
+                cells[x, y] = new Cell(x, y, typeOfTerrain, worldPosition);
 
                 //----- VISUAL PART
 
