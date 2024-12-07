@@ -12,7 +12,7 @@ public class CameraScript : MonoBehaviour
     private InputController _inputs;
     private InputAction _move;
     private InputAction _mouse;
-    Vector2 movementVector = new(0,0);
+    private Vector2 _movementVector = new(0,0);
     private int _borderSize = 50;
     private int _navigationSpeed = 10;
     private float _cameraSize;
@@ -37,16 +37,16 @@ public class CameraScript : MonoBehaviour
     {
         _camera = GetComponent<Camera>();
         _cameraSize = _camera.orthographicSize;
-        _limitOffset.Set(_cameraSize, _cameraSize*Screen.width/Screen.height);
-        _limits = new(_grid.width,_grid.height);
+        _limitOffset.Set(_cameraSize*Screen.width/Screen.height, _cameraSize);
+        _limits = new(_grid.width, _grid.height);
     }
 
     void Update()
     {
         //apply the camera movements
-        movementVector = _move.ReadValue<Vector2>();
-        movementVector += SideMovement(_mouse.ReadValue<Vector2>());
-        transform.position += new Vector3(movementVector.x*_navigationSpeed*Time.deltaTime, movementVector.y*_navigationSpeed*Time.deltaTime, 0);
+        _movementVector = _move.ReadValue<Vector2>();
+        _movementVector += SideMovement(_mouse.ReadValue<Vector2>());
+        transform.position += new Vector3(_movementVector.x*_navigationSpeed*Time.deltaTime, _movementVector.y*_navigationSpeed*Time.deltaTime, 0);
         //check if the camera is out of the map based on the map and camera size
         if (transform.position.x < _limitOffset.x)
         {
