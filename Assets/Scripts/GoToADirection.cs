@@ -23,7 +23,7 @@ public class GoToADirection : MonoBehaviour
     public void GoHere(Vector3 location)
     {
         startPosition = transform.position;
-        Vector3 direction = (location - transform.position).normalized;
+        Vector3 direction = (transform.position + location).normalized;
 
         transform.position += direction * speed * Time.deltaTime;
 
