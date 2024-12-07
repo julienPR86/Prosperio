@@ -21,11 +21,16 @@ public class BuildingSystem : MonoBehaviour
     [SerializeField] Tilemap previewTilemap;
     [SerializeField] Tilemap buildingTilemap;
 
+    //Color of preview tile (if building is valid or not)
+    [SerializeField] Color validColor = Color.green;
+    [SerializeField] Color invalidColor = Color.red;
+
     //building tile sprite
     [SerializeField] RuleTile homeTile, farmTile, schoolTile, libraryTile, museumTile;
 
     //Tile utilisée pour preview (avant build)
-    RuleTile previewTile;
+    RuleTile curBuildingTile;
+    BuildingType curBuildingType;
 
     //Booléen pour savoir si un bâtiment est en preview ou non (phase avant build)
     private bool previewMode;
@@ -37,10 +42,14 @@ public class BuildingSystem : MonoBehaviour
     {
         gridManager = GetComponent<GridManager>();
         resourcesManager = GetComponent<ResourcesManager>();
+        
     }
 
     private void Start()
     {
+        curBuildingType = BuildingType.None;
+        curBuildingTile = null;
+
         previewMode = false;
     }
 
@@ -61,28 +70,41 @@ public class BuildingSystem : MonoBehaviour
                 previewTilemap.ClearAllTiles();
 
                 //Add preview tile on previewTilemap
-                previewTilemap.SetTile(curMouseGridPosition, previewTile);
+                previewTilemap.SetTile(curMouseGridPosition, curBuildingTile);
+
+                //Update la couleur de la tile preview
+                ChangePreviewTileColor();
 
                 //Update last mousegrid position
                 lastMouseGridPosition = curMouseGridPosition;
             }
 
             //Player do right click (--> confirm placement)
-            //TO DO : Control on placement (need logic connexion)
             if (Input.GetMouseButtonDown(0))
             {
-                //Clear preview tilemap
-                previewTilemap.ClearAllTiles();
+                //Terrain control
+                if (CanBuild())
+                {
+                    //Clear preview tilemap
+                    previewTilemap.ClearAllTiles();
 
-                //Set the tile on ground tilemap
-                buildingTilemap.SetTile(curMouseGridPosition, previewTile);
+                    //Connect to logic grid
+                    Cell selectedCell = gridManager.cells[curMouseGridPosition.x, curMouseGridPosition.y];
+                    selectedCell.buildable = false;
+                    selectedCell.buildingInCell = curBuildingType;
 
-                //Leave the preview mode
-                previewMode = false;
+                    //Set the tile on ground tilemap
+                    buildingTilemap.SetTile(curMouseGridPosition, curBuildingTile);
+
+                    //Leave the preview mode
+                    previewMode = false;
+                }
+
+                
             }
 
 
-            //Player leave the building mode
+            //Player leave the building mode (CANCEL PREVIEW)
             if (Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Escape))
             {
                 previewTilemap.ClearAllTiles();
@@ -103,23 +125,25 @@ public class BuildingSystem : MonoBehaviour
     //Méthode pour préparer preview
     public void InitBuilding(BuildingType buildingType)
     {
+        curBuildingType = buildingType;
+
         //MAJ tilePreview en fonction de buildingType
         switch (buildingType)
         {
             case BuildingType.Home:
-                previewTile = homeTile;
+                curBuildingTile = homeTile;
                 break;
             case BuildingType.Farm:
-                previewTile = farmTile;
+                curBuildingTile = farmTile;
                 break;
             case BuildingType.School:
-                previewTile = schoolTile;
+                curBuildingTile = schoolTile;
                 break;
             case BuildingType.Library:
-                previewTile = libraryTile;
+                curBuildingTile = libraryTile;
                 break;
             case BuildingType.Museum:
-                previewTile = museumTile;
+                curBuildingTile = museumTile;
                 break;
             default:
                 return;
@@ -133,11 +157,46 @@ public class BuildingSystem : MonoBehaviour
         lastMouseGridPosition = curMouseGridPosition;
 
         //Set the tile on preview tilemap
-        previewTilemap.SetTile(curMouseGridPosition, previewTile);
+        previewTilemap.SetTile(curMouseGridPosition, curBuildingTile);
+
+        //Update la couleur de la tile preview
+        ChangePreviewTileColor();
 
         //On passe en mode preview
         previewMode = true;
     }
 
+    //Regarde si on peut construire sur la tile ciblee
+    private bool CanBuild()
+    {
+        if (isInBound())
+        {
+            Cell selectedCell = gridManager.cells[curMouseGridPosition.x, curMouseGridPosition.y];
+
+            if ((selectedCell.typeOfTerrain == TypeOfTerrain.Plains) && selectedCell.buildable)
+            {
+                return true;
+            }
+            else return false;
+        }
+
+        return false;
+    }
+
+    //Change de couleur la tile pour indiquer au joueur qu'il peut placer le bâtiment ou non
+    private void ChangePreviewTileColor()
+    {
+        if (CanBuild())
+        {
+            previewTilemap.SetColor(curMouseGridPosition, validColor);
+        }
+        else previewTilemap.SetColor(curMouseGridPosition, invalidColor);
+    }
+
+    //Verifie que la position de la souris est sur la grille/le terrain
+    private bool isInBound()
+    {
+        return (curMouseGridPosition.x >= 0 && curMouseGridPosition.x < gridManager.width && curMouseGridPosition.y >= 0 && curMouseGridPosition.y < gridManager.height);
+    }
     
 }

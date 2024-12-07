@@ -315,7 +315,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 2
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -430,6 +430,8 @@ MonoBehaviour:
   groundTilemap: {fileID: 85914587}
   previewTilemap: {fileID: 2103694581}
   buildingTilemap: {fileID: 656616125}
+  validColor: {r: 0, g: 1, b: 0, a: 1}
+  invalidColor: {r: 1, g: 0, b: 0, a: 1}
   homeTile: {fileID: 11400000, guid: c264fe595694aaf479f702d63f363781, type: 2}
   farmTile: {fileID: 11400000, guid: a616c6728f793b747b46bf91c6bbc5cf, type: 2}
   schoolTile: {fileID: 11400000, guid: f0639a3ee485e5c42b0b523951ad229d, type: 2}
@@ -585,8 +587,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 85914585}
-  - {fileID: 656616123}
   - {fileID: 2103694579}
+  - {fileID: 656616123}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2103694578
@@ -687,7 +689,7 @@ Tilemap:
   m_TileColorArray: []
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.5882353}
   m_Origin: {x: 0, y: 0, z: 0}
   m_Size: {x: 0, y: 0, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
