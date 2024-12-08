@@ -16,7 +16,7 @@ public class GridManager : MonoBehaviour
 
     //tile sprite references
     [SerializeField] RuleTile plainTile, forestTile, stoneTile, berriesTile;
-
+    
 
     void Start()
     {

@@ -8,6 +8,8 @@ public class Cell
 
     public Vector3 WorldPosition;
     public bool buildable { get; set; }
+    public BuildingType buildingInCell;
+
     public TypeOfTerrain typeOfTerrain { get; set; }
 
     //constructeur
@@ -19,6 +21,8 @@ public class Cell
 
         //buildable only if plains
         this.buildable = (typeOfTerrain == TypeOfTerrain.Plains);
+        this.buildingInCell = BuildingType.None;
+
         WorldPosition = worldPosition;
     }
 
@@ -30,5 +34,15 @@ public class Cell
         Forest,
         Berries,
         Stone,
+    }
+
+    public enum BuildingType
+    {
+        None,
+        Home,
+        Farm,
+        School,
+        Library,
+        Museum,
     }
 }

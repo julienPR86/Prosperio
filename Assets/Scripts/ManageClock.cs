@@ -6,7 +6,7 @@ public class ManageClock : MonoBehaviour
     private int hour = 6;
     private int minute = 0;
     private int second = 0;
-    private int day = 1;
+    public int day = 1;
     private float elapsedTime = 0f;
     private float speed = 10000;
     public TextMeshProUGUI textClock;
