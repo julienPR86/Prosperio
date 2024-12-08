@@ -8,8 +8,6 @@ public class Person
     public Job job {  get; set; }
     private bool isTired { get; set; }
 
-    private GameObject personobject;
-
     public Person(Job job = Job.Wanderer, int age = 1, bool isTired = false)
     {
         this.age = age;
