@@ -12,7 +12,11 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] private int foodCount = 10;
     [SerializeField] private int builderCount = 5;
 
-    //Will be used to update Building UI, at the end of day(after gathering) AND after building
+    /// <summary>
+    /// Will be used to update Building UI, at the end of day(after gathering) AND after building
+    /// </summary>
+    /// <param name="costData"></param>
+    /// <returns></returns>
     public bool HasEnoughResources(BuildingCostData costData)
     {
         return (woodCount >= costData.woodCost &&
@@ -20,7 +24,10 @@ public class ResourcesManager : MonoBehaviour
                 builderCount >= costData.builderCost);
     }
 
-    //Spend resources (building)
+    /// <summary>
+    /// Spend resources to building
+    /// </summary>
+    /// <param name="costData"></param>
     public void SpendResource(BuildingCostData costData)
     {
         woodCount = Mathf.Max(0, woodCount - costData.woodCost);

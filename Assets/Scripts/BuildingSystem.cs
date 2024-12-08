@@ -1,8 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
+using static BuildingSystem;
 using static Cell;
 using static UnityEngine.GraphicsBuffer;
 
@@ -10,6 +12,7 @@ public class BuildingSystem : MonoBehaviour
 {
     GridManager gridManager;
     ResourcesManager resourcesManager;
+    ManageClock clock;
 
     //ref des tilemap
     [SerializeField] Tilemap groundTilemap;
@@ -36,11 +39,14 @@ public class BuildingSystem : MonoBehaviour
     private Vector3Int curMouseGridPosition = Vector3Int.zero;
     private Vector3Int lastMouseGridPosition = Vector3Int.zero;
 
+    //List that contain all buildings in progress (to check/update each day)
+    public List<BuildingInProgress> buildingsInProgress;
+
     private void Awake()
     {
         gridManager = GetComponent<GridManager>();
         resourcesManager = GetComponent<ResourcesManager>();
-        
+        clock = GetComponent<ManageClock>();
     }
 
     private void Start()
@@ -48,6 +54,7 @@ public class BuildingSystem : MonoBehaviour
         curBuildingType = BuildingType.None;
         curBuildingTile = null;
         curBuildingCostData = null;
+        buildingsInProgress = new List<BuildingInProgress>();
 
         previewMode = false;
     }
@@ -90,14 +97,11 @@ public class BuildingSystem : MonoBehaviour
                     Cell selectedCell = gridManager.cells[curMouseGridPosition.x, curMouseGridPosition.y];
                     selectedCell.buildable = false;
 
-                    //save building in cell
-                    selectedCell.buildingInCell = curBuildingType;
-
                     //Spend resources
                     resourcesManager.SpendResource(curBuildingCostData);
 
-                    //Set the tile on ground tilemap
-                    buildingTilemap.SetTile(curMouseGridPosition, curBuildingTile);
+                    BuildingInProgress curBuilding = new BuildingInProgress(curMouseGridPosition, curBuildingTile, curBuildingCostData.buildingTime, clock.day);
+                    buildingsInProgress.Add(curBuilding);
 
                     //Leave the preview mode
                     previewMode = false;
@@ -125,7 +129,12 @@ public class BuildingSystem : MonoBehaviour
 
 
 
-    //Method to prepare preview of building
+    /// <summary>
+    /// Method to prepare preview of building
+    /// </summary>
+    /// <param name="buildingType">
+    /// Type of building
+    /// </param>
     public void InitBuilding(BuildingType buildingType)
     {
         curBuildingType = buildingType;
@@ -174,7 +183,10 @@ public class BuildingSystem : MonoBehaviour
         previewMode = true;
     }
 
-    //Check if building on current tile is possible
+    /// <summary>
+    /// Check if building on current tile is possible
+    /// </summary>
+    /// <returns></returns>
     private bool CanBuild()
     {
         if (isInBound())
@@ -193,13 +205,18 @@ public class BuildingSystem : MonoBehaviour
         return false;
     }
 
-    //Check if current tile is in grid bounds
+    /// <summary>
+    /// Check if current tile is in grid bounds
+    /// </summary>
+    /// <returns></returns>
     private bool isInBound()
     {
         return (curMouseGridPosition.x >= 0 && curMouseGridPosition.x < gridManager.width && curMouseGridPosition.y >= 0 && curMouseGridPosition.y < gridManager.height);
     }
-    
-    //Change color of current tile to indicate to player if building is possible here
+
+    /// <summary>
+    /// Change color of current tile to indicate to player if building is possible here
+    /// </summary>
     private void ChangePreviewTileColor()
     {
         if (CanBuild())
@@ -208,4 +225,50 @@ public class BuildingSystem : MonoBehaviour
         }
         else previewTilemap.SetColor(curMouseGridPosition, invalidColor);
     }
+
+    /// <summary>
+    /// Method to update building in progress (to call each day)
+    /// </summary>
+    public void UpdateBuildingsInProgress()
+    {
+        int curDay = clock.day;
+
+        foreach (BuildingInProgress building in buildingsInProgress)
+        {
+            if (curDay >= building.startDay + building.constructionTime)
+            {
+                //Complete building
+
+                //save building in cell
+                Cell curCell = gridManager.cells[building.position.x, building.position.y];
+                curCell.buildingInCell = curBuildingType;
+
+                //Set the tile on ground tilemap
+                buildingTilemap.SetTile(building.position, building.finalTile);
+
+                buildingsInProgress.Remove(building);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Class that represent building in progress
+    /// </summary>
+    public class BuildingInProgress
+    {
+        public Vector3Int position;
+        public RuleTile finalTile;
+        public int startDay;
+        public int constructionTime;
+
+        public BuildingInProgress(Vector3Int _position, RuleTile _finalTile, int _constructionTime, int _startDay)
+        {
+            this.position = _position;
+            this.finalTile = _finalTile;
+            this.constructionTime = _constructionTime;
+            this.startDay = _startDay;
+        }
+    }
+
+
 }
