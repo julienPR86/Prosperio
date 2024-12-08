@@ -4,12 +4,7 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.WSA;
 using static Cell;
-
-//TO DO :
-
-// - Add connect with logic of grid (cells[,])
-// - Add terrain control (need logic connexion) and color change (to indicate)
-// - Add resources consumation
+using static UnityEngine.GraphicsBuffer;
 
 public class BuildingSystem : MonoBehaviour
 {
@@ -27,12 +22,15 @@ public class BuildingSystem : MonoBehaviour
 
     //building tile sprite
     [SerializeField] RuleTile homeTile, farmTile, schoolTile, libraryTile, museumTile;
+    //building cost data
+    [SerializeField] BuildingCostData farmCostData, homeCostData, schoolCostData, libraryCostData, museumCostData;
 
-    //Tile utilisée pour preview (avant build)
+    //Selected building tile and type
     RuleTile curBuildingTile;
     BuildingType curBuildingType;
+    BuildingCostData curBuildingCostData;
 
-    //Booléen pour savoir si un bâtiment est en preview ou non (phase avant build)
+    //preview mode or not
     private bool previewMode;
 
     private Vector3Int curMouseGridPosition = Vector3Int.zero;
@@ -49,6 +47,7 @@ public class BuildingSystem : MonoBehaviour
     {
         curBuildingType = BuildingType.None;
         curBuildingTile = null;
+        curBuildingCostData = null;
 
         previewMode = false;
     }
@@ -69,20 +68,19 @@ public class BuildingSystem : MonoBehaviour
                 //CLear preview tilemap
                 previewTilemap.ClearAllTiles();
 
-                //Add preview tile on previewTilemap
+                //Add current tile on previewTilemap
                 previewTilemap.SetTile(curMouseGridPosition, curBuildingTile);
 
-                //Update la couleur de la tile preview
+                //Update color of current tile (preview)
                 ChangePreviewTileColor();
 
-                //Update last mousegrid position
+                //Update last mouse grid position
                 lastMouseGridPosition = curMouseGridPosition;
             }
 
             //Player do right click (--> confirm placement)
             if (Input.GetMouseButtonDown(0))
             {
-                //Terrain control
                 if (CanBuild())
                 {
                     //Clear preview tilemap
@@ -91,7 +89,12 @@ public class BuildingSystem : MonoBehaviour
                     //Connect to logic grid
                     Cell selectedCell = gridManager.cells[curMouseGridPosition.x, curMouseGridPosition.y];
                     selectedCell.buildable = false;
+
+                    //save building in cell
                     selectedCell.buildingInCell = curBuildingType;
+
+                    //Spend resources
+                    resourcesManager.SpendResource(curBuildingCostData);
 
                     //Set the tile on ground tilemap
                     buildingTilemap.SetTile(curMouseGridPosition, curBuildingTile);
@@ -122,27 +125,32 @@ public class BuildingSystem : MonoBehaviour
 
 
 
-    //Méthode pour préparer preview
+    //Method to prepare preview of building
     public void InitBuilding(BuildingType buildingType)
     {
         curBuildingType = buildingType;
 
-        //MAJ tilePreview en fonction de buildingType
+        //Update current tile(preview) according to buildingType
         switch (buildingType)
         {
             case BuildingType.Home:
+                curBuildingCostData = homeCostData;
                 curBuildingTile = homeTile;
                 break;
             case BuildingType.Farm:
+                curBuildingCostData = farmCostData;
                 curBuildingTile = farmTile;
                 break;
             case BuildingType.School:
+                curBuildingCostData = schoolCostData;
                 curBuildingTile = schoolTile;
                 break;
             case BuildingType.Library:
+                curBuildingCostData = libraryCostData;
                 curBuildingTile = libraryTile;
                 break;
             case BuildingType.Museum:
+                curBuildingCostData = museumCostData;
                 curBuildingTile = museumTile;
                 break;
             default:
@@ -159,20 +167,22 @@ public class BuildingSystem : MonoBehaviour
         //Set the tile on preview tilemap
         previewTilemap.SetTile(curMouseGridPosition, curBuildingTile);
 
-        //Update la couleur de la tile preview
+        //Update color of current tile (preview)
         ChangePreviewTileColor();
 
-        //On passe en mode preview
+        //active preview mode
         previewMode = true;
     }
 
-    //Regarde si on peut construire sur la tile ciblee
+    //Check if building on current tile is possible
     private bool CanBuild()
     {
         if (isInBound())
         {
+            //Get cell according to target tile
             Cell selectedCell = gridManager.cells[curMouseGridPosition.x, curMouseGridPosition.y];
 
+            //If is plains and is buildable
             if ((selectedCell.typeOfTerrain == TypeOfTerrain.Plains) && selectedCell.buildable)
             {
                 return true;
@@ -183,7 +193,13 @@ public class BuildingSystem : MonoBehaviour
         return false;
     }
 
-    //Change de couleur la tile pour indiquer au joueur qu'il peut placer le bâtiment ou non
+    //Check if current tile is in grid bounds
+    private bool isInBound()
+    {
+        return (curMouseGridPosition.x >= 0 && curMouseGridPosition.x < gridManager.width && curMouseGridPosition.y >= 0 && curMouseGridPosition.y < gridManager.height);
+    }
+    
+    //Change color of current tile to indicate to player if building is possible here
     private void ChangePreviewTileColor()
     {
         if (CanBuild())
@@ -192,11 +208,4 @@ public class BuildingSystem : MonoBehaviour
         }
         else previewTilemap.SetColor(curMouseGridPosition, invalidColor);
     }
-
-    //Verifie que la position de la souris est sur la grille/le terrain
-    private bool isInBound()
-    {
-        return (curMouseGridPosition.x >= 0 && curMouseGridPosition.x < gridManager.width && curMouseGridPosition.y >= 0 && curMouseGridPosition.y < gridManager.height);
-    }
-    
 }

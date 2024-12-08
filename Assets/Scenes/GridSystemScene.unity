@@ -437,6 +437,11 @@ MonoBehaviour:
   schoolTile: {fileID: 11400000, guid: f0639a3ee485e5c42b0b523951ad229d, type: 2}
   libraryTile: {fileID: 11400000, guid: 1ba35a0e3f114414196719d7deddf4bb, type: 2}
   museumTile: {fileID: 11400000, guid: 6f3fbe10e408eeb419a50cf7d94cee44, type: 2}
+  farmCostData: {fileID: 11400000, guid: 800181dcd0979774dab1740ee914cfcc, type: 2}
+  homeCostData: {fileID: 11400000, guid: 860ad549811797c4e85f4c7dd48455f9, type: 2}
+  schoolCostData: {fileID: 11400000, guid: 593f24e1eddbf6543b3b7b3d84d0816b, type: 2}
+  libraryCostData: {fileID: 11400000, guid: 63e107935885e754a9aec8482c87d4d0, type: 2}
+  museumCostData: {fileID: 11400000, guid: ab05a26183988384a8a255fcabb34a70, type: 2}
 --- !u!114 &763929042
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -452,6 +457,7 @@ MonoBehaviour:
   woodCount: 10
   stoneCount: 10
   foodCount: 10
+  builderCount: 5
 --- !u!1 &1054157285
 GameObject:
   m_ObjectHideFlags: 0
@@ -689,7 +695,7 @@ Tilemap:
   m_TileColorArray: []
   m_TileObjectToInstantiateArray: []
   m_AnimationFrameRate: 1
-  m_Color: {r: 1, g: 1, b: 1, a: 0.5882353}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: 0, y: 0, z: 0}
   m_Size: {x: 0, y: 0, z: 1}
   m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
