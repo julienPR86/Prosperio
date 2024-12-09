@@ -10,7 +10,7 @@ public class ManageClock : MonoBehaviour
     private float elapsedTime = 0f;
     public float speed = 1000f;
     public TextMeshProUGUI textClock;
-    private bool StopTimer;
+    private bool stopTimer;
 
     void Start()
     {
@@ -26,7 +26,7 @@ public class ManageClock : MonoBehaviour
 
     private void UpdateClock()
     {
-        if (!StopTimer) 
+        if (!stopTimer) 
         {
             second++;
 
@@ -75,11 +75,11 @@ public class ManageClock : MonoBehaviour
 
     public void PauseGameClock()
     {
-        StopTimer = true;
+        stopTimer = true;
     }
 
     public void ResumeGameClock()
     {
-        StopTimer = false;
+        stopTimer = false;
     }
 }
