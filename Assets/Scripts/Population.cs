@@ -4,28 +4,34 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static Person;
 
 public class Population : MonoBehaviour
 {
-    public Sprite circleSprite;
-    public GameObject stock;
+    // Scripts needed
     private GridManager gridManager;
     private ManageClock clock;
-    private bool isWorking = false;
     private ResourcesManager resourcesManager;
-    private int daysPassed = 0;
-    private Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
+    public GameObject PopupManager; // Contains PopupManager script
+    private PopupManager popupManagerText;
+
+    // UI elements + gameobjects needed
+    public Sprite circleSprite;
+    public GameObject populationFolder; // Contains empty objects acting like folders to stock Wanderers, Lumberjacks etc gameobjects
+
+    // Link ALL the gameObjects (key) to an instance of Person class (Value)
+    public Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
+
+    // To update number of workers per category in the UI
     public TextMeshProUGUI harvesterText;
     public TextMeshProUGUI lumberjackText;
     public TextMeshProUGUI diggerText;
     public TextMeshProUGUI wandererText;
     public TextMeshProUGUI masonText;
+
+    public bool isWorking = false;
     public bool isTimerStopped = false;
-    public Button pauseButton;
-    public GameObject PopupManager;
-    private PopupManager popupManagerText;
-    public Slider prosperitySlider;
     private int numberOfDeadToday = 0;
 
     void Start()
@@ -34,57 +40,9 @@ public class Population : MonoBehaviour
         clock = GetComponent<ManageClock>();
         resourcesManager = GetComponent<ResourcesManager>();
         popupManagerText = PopupManager.GetComponent<PopupManager>();
-
-        // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
-        CreateGameObject(Job.Wanderer);
-        CreateGameObject(Job.Wanderer);
-        CreateGameObject(Job.Harvester);
-        CreateGameObject(Job.Lumberjack);
-        CreateGameObject(Job.Digger);
-        CreateGameObject(Job.Mason);
-        pauseButton.onClick.AddListener(PauseGame);
-
-        prosperitySlider.value = 10;
     }
 
-    private void Update()
-    {
-        if (clock.GetTime() == 360 && !isWorking)
-        {
-            popupManagerText.SetPopupText(2, "Workers go to work!");
-            isWorking = true;
-            StopAllCoroutines();
-            GoToWork(Job.Harvester);
-            GoToWork(Job.Lumberjack);
-            GoToWork(Job.Digger);
-            StartWalkingAround();
-        }
-        if (clock.GetTime() == 0 && isWorking)
-        {
-            popupManagerText.SetPopupText(2, "Workers go to sleep!");
-            isWorking = false;
-            StopAllCoroutines();
-            daysPassed++;
-            if (daysPassed == 2) // Spawn of wanderers every 2 days.
-            {
-                daysPassed = 0;
-                CreateGameObject(Job.Wanderer);
-                CreateGameObject(Job.Wanderer);
-                popupManagerText.SetPopupText(1, "2 Wanderers appeared!");
-            }
-            //GoToHouse();
-            EatingTime();
-            AddAge();
-            DyingBecauseOfAge();
-            UpdateProsperity();
-        }
-    }
-    private void SpawnPerson(Person personToSpawn)
-    {
-        CreateGameObject(personToSpawn.job);
-    }
-
-    private void CreateGameObject(Job job)
+    public void CreateGameObject(Job job)
     {
         GameObject personObject = new GameObject();
         personObject.transform.position = new Vector3(5, 5);
@@ -97,27 +55,27 @@ public class Population : MonoBehaviour
         {
             case Job.Harvester:
                 spriteRenderer.color = new Color(9f / 255f, 166f / 255f, 3f / 255f);
-                personObject.transform.SetParent(stock.transform.Find("Harvesters"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Harvesters"));
                 person = new Person(Job.Harvester);
                 break;
             case Job.Wanderer:
                 spriteRenderer.color = new Color(139f / 255f, 140f / 255f, 139f / 255f);
-                personObject.transform.SetParent(stock.transform.Find("Wanderers"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Wanderers"));
                 person = new Person();
                 break;
             case Job.Lumberjack:
                 spriteRenderer.color = new Color(133f / 255f, 75f / 255f, 36f / 255f);
-                personObject.transform.SetParent(stock.transform.Find("Lumberjacks"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Lumberjacks"));
                 person = new Person(Job.Lumberjack);
                 break;
             case Job.Digger:
                 spriteRenderer.color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
-                personObject.transform.SetParent(stock.transform.Find("Diggers"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Diggers"));
                 person = new Person(Job.Digger);
                 break;
             case Job.Mason:
                 spriteRenderer.color = new Color(252f / 255f, 130f / 255f, 0f / 255f);
-                personObject.transform.SetParent(stock.transform.Find("Masons"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Masons"));
                 person = new Person(Job.Mason);
                 break;
         }
@@ -126,13 +84,12 @@ public class Population : MonoBehaviour
         UpdateText();
     }
 
-    private void GoToWork(Job job)
+    public void GoToWork(Job job)
     {
-
         switch (job)
         {
             case Job.Harvester:
-                Transform harvestersFolder = stock.transform.Find("Harvesters").transform;
+                Transform harvestersFolder = populationFolder.transform.Find("Harvesters").transform;
                 for (int i = 0; i < harvestersFolder.childCount; i++)
                 {
                     if (!personDictionary[harvestersFolder.GetChild(i).gameObject].isTired)
@@ -149,7 +106,7 @@ public class Population : MonoBehaviour
                 StartCoroutine(GatherResource(Job.Harvester, 3));
                 break;
             case Job.Lumberjack:
-                Transform lumberjacksFolder = stock.transform.Find("Lumberjacks").transform;
+                Transform lumberjacksFolder = populationFolder.transform.Find("Lumberjacks").transform;
                 for (int i = 0; i < lumberjacksFolder.childCount; i++)
                 {
                     if (!personDictionary[lumberjacksFolder.GetChild(i).gameObject].isTired)
@@ -166,7 +123,7 @@ public class Population : MonoBehaviour
                 StartCoroutine(GatherResource(Job.Lumberjack, 4));
                 break;
             case Job.Digger:
-                Transform diggersFolder = stock.transform.Find("Diggers").transform;
+                Transform diggersFolder = populationFolder.transform.Find("Diggers").transform;
                 for (int i = 0; i < diggersFolder.childCount; i++)
                 {
                     if (!personDictionary[diggersFolder.GetChild(i).gameObject].isTired)
@@ -211,9 +168,9 @@ public class Population : MonoBehaviour
     }
 
 
-    private void StartWalkingAround()
+    public void StartWalkingAround()
     {
-        Transform wanderersFolder = stock.transform.Find("Wanderers").transform;
+        Transform wanderersFolder = populationFolder.transform.Find("Wanderers").transform;
         for (int i = 0; i < wanderersFolder.childCount; i++)
         {
             GameObject wanderer = wanderersFolder.GetChild(i).gameObject;
@@ -298,7 +255,7 @@ public class Population : MonoBehaviour
         switch (job)
         {
             case Job.Harvester:
-                Transform harvestersFolder = stock.transform.Find("Harvesters").transform;
+                Transform harvestersFolder = populationFolder.transform.Find("Harvesters").transform;
                 for (int i = 0; i < harvestersFolder.childCount; i++)
                 {
                     if (!personDictionary[harvestersFolder.GetChild(i).gameObject].isTired)
@@ -308,7 +265,7 @@ public class Population : MonoBehaviour
                 }
                 break;
             case Job.Lumberjack:
-                Transform lumberjacksFolder = stock.transform.Find("Lumberjacks").transform;
+                Transform lumberjacksFolder = populationFolder.transform.Find("Lumberjacks").transform;
                 for (int i = 0; i < lumberjacksFolder.childCount; i++)
                 {
                     if (!personDictionary[lumberjacksFolder.GetChild(i).gameObject].isTired)
@@ -318,7 +275,7 @@ public class Population : MonoBehaviour
                 }
                 break;
             case Job.Digger:
-                Transform diggersFolder = stock.transform.Find("Diggers").transform;
+                Transform diggersFolder = populationFolder.transform.Find("Diggers").transform;
                 for (int i = 0; i < diggersFolder.childCount; i++)
                 {
                     if (!personDictionary[diggersFolder.GetChild(i).gameObject].isTired)
@@ -332,7 +289,7 @@ public class Population : MonoBehaviour
         return active;
     }
 
-    private void GoToHouse()
+    public void GoToHouse()
     {
         int i = 0;
         List<Cell> houses = new List<Cell>();
@@ -370,7 +327,7 @@ public class Population : MonoBehaviour
         }
     }
 
-    private void EatingTime() // Consume food for each person, else they die.
+    public void EatingTime() // Consume food for each person, else they die.
     {
         List<GameObject> peopleToRemove = new List<GameObject>();
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
@@ -397,7 +354,7 @@ public class Population : MonoBehaviour
         UpdateText();
     }
 
-    private void AddAge()
+    public void AddAge()
     {
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
         {
@@ -405,7 +362,7 @@ public class Population : MonoBehaviour
         }
     }
 
-    private void DyingBecauseOfAge()
+    public void DyingBecauseOfAge()
     {
         List<GameObject> peopleToRemove = new List<GameObject>();
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
@@ -429,14 +386,14 @@ public class Population : MonoBehaviour
 
     private void UpdateText()
     {
-        harvesterText.text = stock.transform.Find("Harvesters").transform.childCount.ToString();
-        lumberjackText.text = stock.transform.Find("Lumberjacks").transform.childCount.ToString();
-        diggerText.text = stock.transform.Find("Diggers").transform.childCount.ToString();
-        masonText.text = stock.transform.Find("Masons").transform.childCount.ToString();
-        wandererText.text = stock.transform.Find("Wanderers").transform.childCount.ToString();
+        harvesterText.text = populationFolder.transform.Find("Harvesters").transform.childCount.ToString();
+        lumberjackText.text = populationFolder.transform.Find("Lumberjacks").transform.childCount.ToString();
+        diggerText.text = populationFolder.transform.Find("Diggers").transform.childCount.ToString();
+        masonText.text = populationFolder.transform.Find("Masons").transform.childCount.ToString();
+        wandererText.text = populationFolder.transform.Find("Wanderers").transform.childCount.ToString();
     }
 
-    private void PauseGame()
+    public void PauseGame()
     {
         if (!isTimerStopped) 
         {
@@ -452,20 +409,8 @@ public class Population : MonoBehaviour
         }
     }
 
-    private void UpdateProsperity()
+    public int GetNumberOfDeadPeople()
     {
-        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
-        {
-            if (!person.Value.isTired)
-            {
-                prosperitySlider.value += 1;
-            }
-            else
-            {
-                prosperitySlider.value -= 1;
-            }
-        }
-
-        prosperitySlider.value -= numberOfDeadToday;
+        return numberOfDeadToday;
     }
 }
