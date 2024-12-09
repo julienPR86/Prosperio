@@ -34,6 +34,7 @@ public class Population : MonoBehaviour
         if (clock.GetTime() == 360 && !isWorking)
         {
             isWorking = true;
+            StopAllCoroutines();
             GoToWork(Job.Harvester);
             GoToWork(Job.Lumberjack);
             GoToWork(Job.Digger);
@@ -105,13 +106,16 @@ public class Population : MonoBehaviour
                 Transform harvestersfolder = stock.transform.Find("Harvesters").transform;
                 for (int i = 0; i < harvestersfolder.childCount; i++)
                 {
-                    // Random location
-                    int randomIndex = Random.Range(0, gridManager.berriescells.Count);
+                    if (!personDictionary[harvestersfolder.GetChild(i).gameObject].isTired)
+                    {
+                        // Random location
+                        int randomIndex = Random.Range(0, gridManager.berriescells.Count);
 
-                    Vector3 randomLocation = gridManager.berriescells[randomIndex].WorldPosition;
+                        Vector3 randomLocation = gridManager.berriescells[randomIndex].WorldPosition;
 
-                    // Move the harvester to the target chosen
-                    GoHere(harvestersfolder.GetChild(i).gameObject, randomLocation);
+                        // Move the harvester to the target chosen
+                        GoHere(harvestersfolder.GetChild(i).gameObject, randomLocation);
+                    }
                 }
                 StartCoroutine(GatherResource(Job.Harvester, 3));
                 break;
@@ -119,13 +123,16 @@ public class Population : MonoBehaviour
                 Transform lumberjacksfolder = stock.transform.Find("Lumberjacks").transform;
                 for (int i = 0; i < lumberjacksfolder.childCount; i++)
                 {
-                    // Random location
-                    int randomIndex = Random.Range(0, gridManager.forestcells.Count);
+                    if (!personDictionary[lumberjacksfolder.GetChild(i).gameObject].isTired)
+                    {
+                        // Random location
+                        int randomIndex = Random.Range(0, gridManager.forestcells.Count);
 
-                    Vector3 randomLocation = gridManager.forestcells[randomIndex].WorldPosition;
+                        Vector3 randomLocation = gridManager.forestcells[randomIndex].WorldPosition;
 
-                    // Move the lumberjack to the target chosen
-                    GoHere(lumberjacksfolder.GetChild(i).gameObject, randomLocation);
+                        // Move the lumberjack to the target chosen
+                        GoHere(lumberjacksfolder.GetChild(i).gameObject, randomLocation);
+                    }
                 }
                 StartCoroutine(GatherResource(Job.Lumberjack, 4));
                 break;
@@ -133,13 +140,16 @@ public class Population : MonoBehaviour
                 Transform diggerfolder = stock.transform.Find("Diggers").transform;
                 for (int i = 0; i < diggerfolder.childCount; i++)
                 {
-                    // Random location
-                    int randomIndex = Random.Range(0, gridManager.stonecells.Count);
+                    if (!personDictionary[diggerfolder.GetChild(i).gameObject].isTired)
+                    {
+                        // Random location
+                        int randomIndex = Random.Range(0, gridManager.stonecells.Count);
 
-                    Vector3 randomLocation = gridManager.stonecells[randomIndex].WorldPosition;
+                        Vector3 randomLocation = gridManager.stonecells[randomIndex].WorldPosition;
 
-                    // Move the digger to the target chosen
-                    GoHere(diggerfolder.GetChild(i).gameObject, randomLocation);
+                        // Move the digger to the target chosen
+                        GoHere(diggerfolder.GetChild(i).gameObject, randomLocation);
+                    }
                 }
                 StartCoroutine(GatherResource(Job.Digger, 5));
                 break;
@@ -177,9 +187,17 @@ public class Population : MonoBehaviour
             GameObject wanderer = wanderersFolder.GetChild(i).gameObject;
             StartCoroutine(WalkRandomly(wanderer));
         }
+
+        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+        {
+            if (person.Value.isTired)
+            {
+                StartCoroutine(WalkRandomly(person.Key));
+            }
+        }
     }
 
-    private IEnumerator WalkRandomly(GameObject wanderer) // Coroutine to make the wanderers walking around
+    private IEnumerator WalkRandomly(GameObject person) // Coroutine to make the wanderers and tired people walking around
     {
         while (true)
         {
@@ -190,17 +208,11 @@ public class Population : MonoBehaviour
             Vector3 randomLocation = gridManager.cells[randomX, randomY].WorldPosition;
 
             // Move the wanderer to the new random location
-            yield return MoveToTarget(wanderer, randomLocation, 3f); // Adjust speed as needed
+            yield return MoveToTarget(person, randomLocation, 3f); // Adjust speed as needed
 
             float waitTime = Random.Range(1f, 3f); // Repeat after waiting X seconds
             yield return new WaitForSeconds(waitTime);
         }
-    }
-
-
-    public void GoToSleep()
-    {
-        // function called at the end of the day to make people go to sleep
     }
 
     private IEnumerator GatherResource(Job job, int interval)
