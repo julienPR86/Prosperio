@@ -413,4 +413,9 @@ public class Population : MonoBehaviour
     {
         return numberOfDeadToday;
     }
+
+    public void ResetDeadNumber()
+    {
+        numberOfDeadToday = 0;
+    }
 }

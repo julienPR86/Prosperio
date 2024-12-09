@@ -58,6 +58,7 @@ public class GameManagement : MonoBehaviour
         if (clock.GetTime() == workTime && !isWorking) 
         {
             popupManagerText.SetPopupText(2, "Workers go to work!");
+            population.ResetDeadNumber();
 
             isWorking = true;
             population.isWorking = isWorking;
