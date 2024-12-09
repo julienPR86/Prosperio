@@ -4,92 +4,50 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.UIElements;
 using static Person;
 
 public class Population : MonoBehaviour
 {
-    public Sprite circleSprite;
-    public GameObject stock;
+    // Scripts needed
     private GridManager gridManager;
     private ManageClock clock;
-    private bool isWorking = false;
     private ResourcesManager resourcesManager;
-    private int DaysPassed = 0;
-    private Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
-    public TextMeshProUGUI harvestertext;
-    public TextMeshProUGUI lumberjacktext;
-    public TextMeshProUGUI diggertext;
-    public TextMeshProUGUI wanderertext;
-    public TextMeshProUGUI masontext;
+    public GameObject PopupManager; // Contains PopupManager script
+    private PopupManager popupManagerText;
+
+    // UI elements + gameobjects needed
+    public Sprite circleSprite;
+    public GameObject populationFolder; // Contains empty objects acting like folders to stock Wanderers, Lumberjacks etc gameobjects
+
+    // Link ALL the gameObjects (key) to an instance of Person class (Value)
+    public Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
+
+    // To update number of workers per category in the UI
+    public TextMeshProUGUI harvesterText;
+    public TextMeshProUGUI lumberjackText;
+    public TextMeshProUGUI diggerText;
+    public TextMeshProUGUI wandererText;
+    public TextMeshProUGUI masonText;
+
+    public bool isWorking = false;
     public bool isTimerStopped = false;
-    public Button PauseButton;
-    public GameObject PopupManager;
-    private PopupManager PopupManagerText;
-    public Slider prosperityslider;
-    private int numberofdeadday = 0;
+    private int numberOfDeadToday = 0;
 
     void Start()
     {
         gridManager = GetComponent<GridManager>();
         clock = GetComponent<ManageClock>();
         resourcesManager = GetComponent<ResourcesManager>();
-        PopupManagerText = PopupManager.GetComponent<PopupManager>();
-
-        // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
-        CreateGameObject(Job.Wanderer);
-        CreateGameObject(Job.Wanderer);
-        CreateGameObject(Job.Harvester);
-        CreateGameObject(Job.Lumberjack);
-        CreateGameObject(Job.Digger);
-        CreateGameObject(Job.Mason);
-        PauseButton.onClick.AddListener(PauseGame);
-
-        prosperityslider.value = 10;
+        popupManagerText = PopupManager.GetComponent<PopupManager>();
     }
 
-    private void Update()
+    public void CreateGameObject(Job job)
     {
-        if (clock.GetTime() == 360 && !isWorking)
-        {
-            PopupManagerText.SetPopupText(2, "Workers go to work!");
-            isWorking = true;
-            StopAllCoroutines();
-            GoToWork(Job.Harvester);
-            GoToWork(Job.Lumberjack);
-            GoToWork(Job.Digger);
-            StartWalkingAround();
-        }
-        if (clock.GetTime() == 0 && isWorking)
-        {
-            PopupManagerText.SetPopupText(2, "Workers go to sleep!");
-            isWorking = false;
-            StopAllCoroutines();
-            DaysPassed++;
-            if (DaysPassed == 2) // Spawn of wanderers every 2 days.
-            {
-                DaysPassed = 0;
-                CreateGameObject(Job.Wanderer);
-                CreateGameObject(Job.Wanderer);
-                PopupManagerText.SetPopupText(1, "2 Wanderers appeared!");
-            }
-            //GoToHouse();
-            EatingTime();
-            AddAge();
-            DyingBecauseOfAge();
-            UpdateProsperity();
-        }
-    }
-    private void SpawnPerson(Person persontospawn)
-    {
-        CreateGameObject(persontospawn.job);
-    }
-
-    private void CreateGameObject(Job job)
-    {
-        GameObject personobject = new GameObject();
-        personobject.transform.position = new Vector3(5, 5);
-        personobject.transform.localScale = new Vector3(0.3f, 0.3f);
-        SpriteRenderer spriteRenderer = personobject.AddComponent<SpriteRenderer>();
+        GameObject personObject = new GameObject();
+        personObject.transform.position = new Vector3(5, 5);
+        personObject.transform.localScale = new Vector3(0.3f, 0.3f);
+        SpriteRenderer spriteRenderer = personObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = circleSprite;
         Person person = null;
 
@@ -97,45 +55,44 @@ public class Population : MonoBehaviour
         {
             case Job.Harvester:
                 spriteRenderer.color = new Color(9f / 255f, 166f / 255f, 3f / 255f);
-                personobject.transform.SetParent(stock.transform.Find("Harvesters"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Harvesters"));
                 person = new Person(Job.Harvester);
                 break;
             case Job.Wanderer:
                 spriteRenderer.color = new Color(139f / 255f, 140f / 255f, 139f / 255f);
-                personobject.transform.SetParent(stock.transform.Find("Wanderers"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Wanderers"));
                 person = new Person();
                 break;
             case Job.Lumberjack:
                 spriteRenderer.color = new Color(133f / 255f, 75f / 255f, 36f / 255f);
-                personobject.transform.SetParent(stock.transform.Find("Lumberjacks"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Lumberjacks"));
                 person = new Person(Job.Lumberjack);
                 break;
             case Job.Digger:
                 spriteRenderer.color = new Color(255f / 255f, 255f / 255f, 255f / 255f);
-                personobject.transform.SetParent(stock.transform.Find("Diggers"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Diggers"));
                 person = new Person(Job.Digger);
                 break;
             case Job.Mason:
                 spriteRenderer.color = new Color(252f / 255f, 130f / 255f, 0f / 255f);
-                personobject.transform.SetParent(stock.transform.Find("Masons"));
+                personObject.transform.SetParent(populationFolder.transform.Find("Masons"));
                 person = new Person(Job.Mason);
                 break;
         }
 
-        personDictionary.Add(personobject, person);
+        personDictionary.Add(personObject, person);
         UpdateText();
     }
 
-    private void GoToWork(Job job)
+    public void GoToWork(Job job)
     {
-
         switch (job)
         {
             case Job.Harvester:
-                Transform harvestersfolder = stock.transform.Find("Harvesters").transform;
-                for (int i = 0; i < harvestersfolder.childCount; i++)
+                Transform harvestersFolder = populationFolder.transform.Find("Harvesters").transform;
+                for (int i = 0; i < harvestersFolder.childCount; i++)
                 {
-                    if (!personDictionary[harvestersfolder.GetChild(i).gameObject].isTired)
+                    if (!personDictionary[harvestersFolder.GetChild(i).gameObject].isTired)
                     {
                         // Random location
                         int randomIndex = Random.Range(0, gridManager.berriescells.Count);
@@ -143,16 +100,16 @@ public class Population : MonoBehaviour
                         Vector3 randomLocation = gridManager.berriescells[randomIndex].WorldPosition;
 
                         // Move the harvester to the target chosen
-                        GoHere(harvestersfolder.GetChild(i).gameObject, randomLocation);
+                        GoHere(harvestersFolder.GetChild(i).gameObject, randomLocation);
                     }
                 }
                 StartCoroutine(GatherResource(Job.Harvester, 3));
                 break;
             case Job.Lumberjack:
-                Transform lumberjacksfolder = stock.transform.Find("Lumberjacks").transform;
-                for (int i = 0; i < lumberjacksfolder.childCount; i++)
+                Transform lumberjacksFolder = populationFolder.transform.Find("Lumberjacks").transform;
+                for (int i = 0; i < lumberjacksFolder.childCount; i++)
                 {
-                    if (!personDictionary[lumberjacksfolder.GetChild(i).gameObject].isTired)
+                    if (!personDictionary[lumberjacksFolder.GetChild(i).gameObject].isTired)
                     {
                         // Random location
                         int randomIndex = Random.Range(0, gridManager.forestcells.Count);
@@ -160,16 +117,16 @@ public class Population : MonoBehaviour
                         Vector3 randomLocation = gridManager.forestcells[randomIndex].WorldPosition;
 
                         // Move the lumberjack to the target chosen
-                        GoHere(lumberjacksfolder.GetChild(i).gameObject, randomLocation);
+                        GoHere(lumberjacksFolder.GetChild(i).gameObject, randomLocation);
                     }
                 }
                 StartCoroutine(GatherResource(Job.Lumberjack, 4));
                 break;
             case Job.Digger:
-                Transform diggerfolder = stock.transform.Find("Diggers").transform;
-                for (int i = 0; i < diggerfolder.childCount; i++)
+                Transform diggersFolder = populationFolder.transform.Find("Diggers").transform;
+                for (int i = 0; i < diggersFolder.childCount; i++)
                 {
-                    if (!personDictionary[diggerfolder.GetChild(i).gameObject].isTired)
+                    if (!personDictionary[diggersFolder.GetChild(i).gameObject].isTired)
                     {
                         // Random location
                         int randomIndex = Random.Range(0, gridManager.stonecells.Count);
@@ -177,7 +134,7 @@ public class Population : MonoBehaviour
                         Vector3 randomLocation = gridManager.stonecells[randomIndex].WorldPosition;
 
                         // Move the digger to the target chosen
-                        GoHere(diggerfolder.GetChild(i).gameObject, randomLocation);
+                        GoHere(diggersFolder.GetChild(i).gameObject, randomLocation);
                     }
                 }
                 StartCoroutine(GatherResource(Job.Digger, 5));
@@ -211,9 +168,9 @@ public class Population : MonoBehaviour
     }
 
 
-    private void StartWalkingAround()
+    public void StartWalkingAround()
     {
-        Transform wanderersFolder = stock.transform.Find("Wanderers").transform;
+        Transform wanderersFolder = populationFolder.transform.Find("Wanderers").transform;
         for (int i = 0; i < wanderersFolder.childCount; i++)
         {
             GameObject wanderer = wanderersFolder.GetChild(i).gameObject;
@@ -253,6 +210,9 @@ public class Population : MonoBehaviour
 
     private IEnumerator GatherResource(Job job, int interval)
     {
+        float elapsedTime = 0f;
+        float targetTime = clock.GetRealSecondsPerInGameHour() * interval;
+
         while (isWorking)
         {
             while (isTimerStopped)
@@ -260,11 +220,14 @@ public class Population : MonoBehaviour
                 yield return null; // Wait until the game is resumed
             }
 
-            yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
+            // Increment elapsed time based on real-time passage : This is to avoid that the timer of the Coroutine resets.
+            elapsedTime += Time.deltaTime;
 
-            if (!isTimerStopped)
+            // Check if the elapsed time has reached or exceeded the target time
+            if (elapsedTime >= targetTime)
             {
-                yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
+                elapsedTime = 0f;
+
                 switch (job)
                 {
                     case Job.Harvester:
@@ -278,8 +241,11 @@ public class Population : MonoBehaviour
                         break;
                 }
             }
+
+            yield return null; // Wait until the next frame
         }
     }
+
 
 
     private int GetActiveWorkers(Job job)
@@ -289,30 +255,30 @@ public class Population : MonoBehaviour
         switch (job)
         {
             case Job.Harvester:
-                Transform harvestersfolder = stock.transform.Find("Harvesters").transform;
-                for (int i = 0; i < harvestersfolder.childCount; i++)
+                Transform harvestersFolder = populationFolder.transform.Find("Harvesters").transform;
+                for (int i = 0; i < harvestersFolder.childCount; i++)
                 {
-                    if (!personDictionary[harvestersfolder.GetChild(i).gameObject].isTired)
+                    if (!personDictionary[harvestersFolder.GetChild(i).gameObject].isTired)
                     {
                         active++;
                     }
                 }
                 break;
             case Job.Lumberjack:
-                Transform lumberjacksfolder = stock.transform.Find("Lumberjacks").transform;
-                for (int i = 0; i < lumberjacksfolder.childCount; i++)
+                Transform lumberjacksFolder = populationFolder.transform.Find("Lumberjacks").transform;
+                for (int i = 0; i < lumberjacksFolder.childCount; i++)
                 {
-                    if (!personDictionary[lumberjacksfolder.GetChild(i).gameObject].isTired)
+                    if (!personDictionary[lumberjacksFolder.GetChild(i).gameObject].isTired)
                     {
                         active++;
                     }
                 }
                 break;
             case Job.Digger:
-                Transform diggersfolder = stock.transform.Find("Diggers").transform;
-                for (int i = 0; i < diggersfolder.childCount; i++)
+                Transform diggersFolder = populationFolder.transform.Find("Diggers").transform;
+                for (int i = 0; i < diggersFolder.childCount; i++)
                 {
-                    if (!personDictionary[diggersfolder.GetChild(i).gameObject].isTired)
+                    if (!personDictionary[diggersFolder.GetChild(i).gameObject].isTired)
                     {
                         active++;
                     }
@@ -323,7 +289,7 @@ public class Population : MonoBehaviour
         return active;
     }
 
-    private void GoToHouse()
+    public void GoToHouse()
     {
         int i = 0;
         List<Cell> houses = new List<Cell>();
@@ -355,15 +321,15 @@ public class Population : MonoBehaviour
                 else
                 {
                     person.Value.isTired = true;
-                    PopupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
+                    popupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
                 }
             }
         }
     }
 
-    private void EatingTime() // Consume food for each person, else they die.
+    public void EatingTime() // Consume food for each person, else they die.
     {
-        List<GameObject> keysToRemove = new List<GameObject>();
+        List<GameObject> peopleToRemove = new List<GameObject>();
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
         {
             if (resourcesManager.GetFoodCount() > 0)
@@ -372,23 +338,23 @@ public class Population : MonoBehaviour
             }
             else
             {
-                keysToRemove.Add(person.Key);
+                peopleToRemove.Add(person.Key);
                 Destroy(person.Key.gameObject);
             }
         }
 
-        foreach (GameObject key in keysToRemove)
+        foreach (GameObject key in peopleToRemove)
         {
             personDictionary.Remove(key);
-            numberofdeadday++;
+            numberOfDeadToday++;
         }
 
-        PopupManagerText.SetPopupText(0, $"{keysToRemove.Count} people died of hunger.");
+        popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of hunger.");
 
         UpdateText();
     }
 
-    private void AddAge()
+    public void AddAge()
     {
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
         {
@@ -396,67 +362,60 @@ public class Population : MonoBehaviour
         }
     }
 
-    private void DyingBecauseOfAge()
+    public void DyingBecauseOfAge()
     {
-        List<GameObject> keysToRemove = new List<GameObject>();
+        List<GameObject> peopleToRemove = new List<GameObject>();
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
         {
-            if (person.Value.age >= 4)
+            if (person.Value.age >= 25)
             {
-                keysToRemove.Add(person.Key);
+                peopleToRemove.Add(person.Key);
                 Destroy(person.Key.gameObject);
             }
         }
 
-        foreach (GameObject key in keysToRemove)
+        foreach (GameObject key in peopleToRemove)
         {
             personDictionary.Remove(key);
-            numberofdeadday++;
+            numberOfDeadToday++;
         }
 
-        PopupManagerText.SetPopupText(0, $"{keysToRemove.Count} people died of age.");
+        popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of age.");
         UpdateText();
     }
 
     private void UpdateText()
     {
-        harvestertext.text = stock.transform.Find("Harvesters").transform.childCount.ToString();
-        lumberjacktext.text = stock.transform.Find("Lumberjacks").transform.childCount.ToString();
-        diggertext.text = stock.transform.Find("Diggers").transform.childCount.ToString();
-        masontext.text = stock.transform.Find("Masons").transform.childCount.ToString();
-        wanderertext.text = stock.transform.Find("Wanderers").transform.childCount.ToString();
+        harvesterText.text = populationFolder.transform.Find("Harvesters").transform.childCount.ToString();
+        lumberjackText.text = populationFolder.transform.Find("Lumberjacks").transform.childCount.ToString();
+        diggerText.text = populationFolder.transform.Find("Diggers").transform.childCount.ToString();
+        masonText.text = populationFolder.transform.Find("Masons").transform.childCount.ToString();
+        wandererText.text = populationFolder.transform.Find("Wanderers").transform.childCount.ToString();
     }
 
-    private void PauseGame()
+    public void PauseGame()
     {
         if (!isTimerStopped) 
         {
             clock.PauseGameClock();
             isTimerStopped = true;
-            PopupManagerText.SetPopupText(0, "Time paused.");
+            popupManagerText.SetPopupText(0, "Time paused.");
         }
         else
         {
             clock.ResumeGameClock();
             isTimerStopped = false;
-            PopupManagerText.SetPopupText(0, "Time resumed.");
+            popupManagerText.SetPopupText(0, "Time resumed.");
         }
     }
 
-    private void UpdateProsperity()
+    public int GetNumberOfDeadPeople()
     {
-        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
-        {
-            if (!person.Value.isTired)
-            {
-                prosperityslider.value += 1;
-            }
-            else
-            {
-                prosperityslider.value -= 1;
-            }
-        }
+        return numberOfDeadToday;
+    }
 
-        prosperityslider.value -= numberofdeadday;
+    public void ResetDeadNumber()
+    {
+        numberOfDeadToday = 0;
     }
 }

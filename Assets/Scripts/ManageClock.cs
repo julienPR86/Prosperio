@@ -8,9 +8,9 @@ public class ManageClock : MonoBehaviour
     private int second = 0;
     public int day = 1;
     private float elapsedTime = 0f;
-    public float speed = 10000;
+    public float speed = 1000f;
     public TextMeshProUGUI textClock;
-    private bool StopTimer;
+    private bool stopTimer;
 
     void Start()
     {
@@ -26,7 +26,7 @@ public class ManageClock : MonoBehaviour
 
     private void UpdateClock()
     {
-        if (!StopTimer) 
+        if (!stopTimer) 
         {
             second++;
 
@@ -75,11 +75,11 @@ public class ManageClock : MonoBehaviour
 
     public void PauseGameClock()
     {
-        StopTimer = true;
+        stopTimer = true;
     }
 
     public void ResumeGameClock()
     {
-        StopTimer = false;
+        stopTimer = false;
     }
 }
