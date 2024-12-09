@@ -1,7 +1,8 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
-public class TogglePanelControl : MonoBehaviour
+public class TogglePanelControl : MonoBehaviour, IPointerDownHandler
 {
     public Toggle targetToggle;  // Le Toggle qui contrôle la visibilité du Panel
     public GameObject panelToControl; // Le Panel à contrôler
@@ -14,24 +15,30 @@ public class TogglePanelControl : MonoBehaviour
         panelToControl.SetActive(targetToggle.isOn);
     }
 
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        // Si on clique en dehors du Toggle et du Panel, on désactive le Toggle et le Panel
+        if (!IsPointerOverUIElement(targetToggle.gameObject) && !IsPointerOverUIElement(panelToControl))
+        {
+            targetToggle.isOn = false; // Désactive le Toggle
+            panelToControl.SetActive(false); // Désactive le Panel
+        }
+    }
+
     void Update()
     {
-        // Vérifie si on clique sur la scène (clic gauche)
-        if (Input.GetMouseButtonDown(0)) // 0 = clic gauche
-        {
-            // Si on clique en dehors du Toggle et du Panel, on désactive le Toggle et le Panel
-            if (!RectTransformUtility.RectangleContainsScreenPoint(targetToggle.GetComponent<RectTransform>(), Input.mousePosition, Camera.main) &&
-                !RectTransformUtility.RectangleContainsScreenPoint(panelToControl.GetComponent<RectTransform>(), Input.mousePosition, Camera.main))
-            {
-                targetToggle.isOn = false; // Désactive le Toggle
-            }
-        }
-
         // Met à jour la visibilité du Panel en fonction de l'état du Toggle
         if (targetToggle.isOn != isPanelVisible)
         {
             isPanelVisible = targetToggle.isOn;
             panelToControl.SetActive(isPanelVisible);
         }
+    }
+
+    // Vérifie si le pointeur (clic) est sur un élément UI
+    bool IsPointerOverUIElement(GameObject uiElement)
+    {
+        RectTransform rectTransform = uiElement.GetComponent<RectTransform>();
+        return RectTransformUtility.RectangleContainsScreenPoint(rectTransform, Input.mousePosition, Camera.main);
     }
 }
