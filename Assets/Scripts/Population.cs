@@ -12,6 +12,7 @@ public class Population : MonoBehaviour
     private ManageClock clock;
     private bool isWorking = false;
     private ResourcesManager resourcesManager;
+    private int DaysPassed = 0;
     private Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
     void Start()
     {
@@ -44,11 +45,17 @@ public class Population : MonoBehaviour
         {
             isWorking = false;
             StopAllCoroutines();
+            DaysPassed++;
+            if (DaysPassed == 2) // Spawn of wanderers every 2 days.
+            {
+                DaysPassed = 0;
+                CreateGameObject(Job.Wanderer);
+                CreateGameObject(Job.Wanderer);
+            }
             GoToHouse();
             EatingTime();
             DyingBecauseOfAge();
             AddAge();
-            Debug.Log("All workers are now sleeping.");
         }
     }
     private void SpawnPerson(Person persontospawn)
