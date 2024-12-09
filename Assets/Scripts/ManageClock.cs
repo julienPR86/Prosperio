@@ -8,7 +8,7 @@ public class ManageClock : MonoBehaviour
     private int second = 0;
     public int day = 1;
     private float elapsedTime = 0f;
-    private float speed = 100;
+    public float speed = 10000;
     public TextMeshProUGUI textClock;
 
     void Start()
@@ -62,5 +62,10 @@ public class ManageClock : MonoBehaviour
     public int GetTime() // Renvoit l'heure actuelle en minutes
     {
         return hour * 60 + minute;
+    }
+
+    public float GetRealSecondsPerInGameHour()
+    {
+        return 3600f / speed; // Real-world seconds for one in-game hour
     }
 }

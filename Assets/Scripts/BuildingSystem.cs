@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.WSA;
 using static BuildingSystem;
 using static Cell;
 using static UnityEngine.GraphicsBuffer;
@@ -269,6 +268,4 @@ public class BuildingSystem : MonoBehaviour
             this.startDay = _startDay;
         }
     }
-
-
 }

@@ -11,15 +11,18 @@ public class Population : MonoBehaviour
     private GridManager gridManager;
     private ManageClock clock;
     private bool isWorking = false;
+    private ResourcesManager resourcesManager;
     private Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
     void Start()
     {
         gridManager = GetComponent<GridManager>();
         clock = GetComponent<ManageClock>();
+        resourcesManager = GetComponent<ResourcesManager>();
 
         // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
         CreateGameObject(Job.Wanderer);
         CreateGameObject(Job.Wanderer);
+        CreateGameObject(Job.Harvester);
         CreateGameObject(Job.Harvester);
         CreateGameObject(Job.Lumberjack);
         CreateGameObject(Job.Digger);
@@ -30,15 +33,21 @@ public class Population : MonoBehaviour
     {
         if (clock.GetTime() == 360 && !isWorking)
         {
+            isWorking = true;
             GoToWork(Job.Harvester);
             GoToWork(Job.Lumberjack);
             GoToWork(Job.Digger);
             StartWalkingAround();
-            isWorking = true;
         }
-        if (clock.GetTime() == 0 && isWorking) 
+        if (clock.GetTime() == 0 && isWorking)
         {
-            // go to sleep
+            isWorking = false;
+            StopAllCoroutines();
+            GoToHouse();
+            EatingTime();
+            DyingBecauseOfAge();
+            AddAge();
+            Debug.Log("All workers are now sleeping.");
         }
     }
     private void SpawnPerson(Person persontospawn)
@@ -55,7 +64,7 @@ public class Population : MonoBehaviour
         spriteRenderer.sprite = circleSprite;
         Person person = null;
 
-        switch (job) 
+        switch (job)
         {
             case Job.Harvester:
                 spriteRenderer.color = new Color(9f / 255f, 166f / 255f, 3f / 255f);
@@ -104,6 +113,7 @@ public class Population : MonoBehaviour
                     // Move the harvester to the target chosen
                     GoHere(harvestersfolder.GetChild(i).gameObject, randomLocation);
                 }
+                StartCoroutine(GatherResource(Job.Harvester, 3));
                 break;
             case Job.Lumberjack:
                 Transform lumberjacksfolder = stock.transform.Find("Lumberjacks").transform;
@@ -117,6 +127,7 @@ public class Population : MonoBehaviour
                     // Move the lumberjack to the target chosen
                     GoHere(lumberjacksfolder.GetChild(i).gameObject, randomLocation);
                 }
+                StartCoroutine(GatherResource(Job.Lumberjack, 4));
                 break;
             case Job.Digger:
                 Transform diggerfolder = stock.transform.Find("Diggers").transform;
@@ -130,6 +141,7 @@ public class Population : MonoBehaviour
                     // Move the digger to the target chosen
                     GoHere(diggerfolder.GetChild(i).gameObject, randomLocation);
                 }
+                StartCoroutine(GatherResource(Job.Digger, 5));
                 break;
         }
     }
@@ -191,5 +203,147 @@ public class Population : MonoBehaviour
         // function called at the end of the day to make people go to sleep
     }
 
+    private IEnumerator GatherResource(Job job, int interval)
+    {
+        while (isWorking) // Continue gathering resources while working
+        {
+            yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
 
+            switch (job)
+            {
+                case Job.Harvester:
+                    resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester));
+                    break;
+                case Job.Lumberjack:
+                    resourcesManager.AddWood(1 * GetActiveWorkers(Job.Lumberjack));
+                    break;
+                case Job.Digger:
+                    resourcesManager.AddStone(1 * GetActiveWorkers(Job.Lumberjack));
+                    break;
+            }
+        }
+    }
+
+    private int GetActiveWorkers(Job job)
+    {
+        int active = 0;
+
+        switch (job)
+        {
+            case Job.Harvester:
+                Transform harvestersfolder = stock.transform.Find("Harvesters").transform;
+                for (int i = 0; i < harvestersfolder.childCount; i++)
+                {
+                    if (!personDictionary[harvestersfolder.GetChild(i).gameObject].isTired)
+                    {
+                        active++;
+                    }
+                }
+                break;
+            case Job.Lumberjack:
+                Transform lumberjacksfolder = stock.transform.Find("Lumberjacks").transform;
+                for (int i = 0; i < lumberjacksfolder.childCount; i++)
+                {
+                    if (!personDictionary[lumberjacksfolder.GetChild(i).gameObject].isTired)
+                    {
+                        active++;
+                    }
+                }
+                break;
+            case Job.Digger:
+                Transform diggersfolder = stock.transform.Find("Diggers").transform;
+                for (int i = 0; i < diggersfolder.childCount; i++)
+                {
+                    if (!personDictionary[diggersfolder.GetChild(i).gameObject].isTired)
+                    {
+                        active++;
+                    }
+                }
+                break;
+        }
+
+        return active;
+    }
+
+    private void GoToHouse()
+    {
+        int i = 0;
+        List<Cell> houses = new List<Cell>();
+        foreach (Cell cell in gridManager.cells)  // Storing all the cells that are House.
+        {
+            if (cell.buildingInCell == Cell.BuildingType.School)
+            {
+                houses.Add(cell);
+            }
+        }
+
+        foreach (KeyValuePair<GameObject, Person> person in personDictionary) // Placing every person to a house if this one is not full, else, the person will be tired
+        {
+            if (houses.Count > 0 || houses[i] != null)
+            {
+                if (!houses[i].isFull)
+                {
+                    houses[i].AddPeople();
+                    person.Value.isTired = false;
+                    GoHere(person.Key, houses[i].WorldPosition);
+                }
+                else
+                {
+                    i++;
+                }
+            }
+            else
+            {
+                person.Value.isTired = true;
+            }
+        }
+    }
+
+    private void EatingTime() // Consume food for each person, else they die.
+    {
+        List<GameObject> keysToRemove = new List<GameObject>();
+        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+        {
+            if (resourcesManager.GetFoodCount() > 0)
+            {
+                resourcesManager.CousumeFood(1);
+            }
+            else
+            {
+                keysToRemove.Add(person.Key);
+                Destroy(person.Key.gameObject);
+            }
+        }
+
+        foreach (GameObject key in keysToRemove)
+        {
+            personDictionary.Remove(key);
+        }
+    }
+
+    private void AddAge()
+    {
+        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+        {
+            person.Value.age++;
+        }
+    }
+
+    private void DyingBecauseOfAge()
+    {
+        List<GameObject> keysToRemove = new List<GameObject>();
+        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+        {
+            if (person.Value.age >= 4)
+            {
+                keysToRemove.Add(person.Key);
+                Destroy(person.Key.gameObject);
+            }
+        }
+
+        foreach (GameObject key in keysToRemove)
+        {
+            personDictionary.Remove(key);
+        }
+    }
 }
