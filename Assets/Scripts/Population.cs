@@ -23,11 +23,15 @@ public class Population : MonoBehaviour
     public TextMeshProUGUI masontext;
     public bool isTimerStopped = false;
     public Button PauseButton;
+    public GameObject PopupManager;
+    private PopupManager PopupManagerText;
+
     void Start()
     {
         gridManager = GetComponent<GridManager>();
         clock = GetComponent<ManageClock>();
         resourcesManager = GetComponent<ResourcesManager>();
+        PopupManagerText = PopupManager.GetComponent<PopupManager>();
 
         // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
         CreateGameObject(Job.Wanderer);
@@ -43,6 +47,7 @@ public class Population : MonoBehaviour
     {
         if (clock.GetTime() == 360 && !isWorking)
         {
+            PopupManagerText.SetPopupText(1, "Workers go to work!");
             isWorking = true;
             StopAllCoroutines();
             GoToWork(Job.Harvester);
@@ -52,6 +57,7 @@ public class Population : MonoBehaviour
         }
         if (clock.GetTime() == 0 && isWorking)
         {
+            PopupManagerText.SetPopupText(1, "Workers go to sleep!");
             isWorking = false;
             StopAllCoroutines();
             DaysPassed++;
@@ -60,8 +66,9 @@ public class Population : MonoBehaviour
                 DaysPassed = 0;
                 CreateGameObject(Job.Wanderer);
                 CreateGameObject(Job.Wanderer);
+                PopupManagerText.SetPopupText(2, "2 Wanderers appeared!");
             }
-            GoToHouse();
+            //GoToHouse();
             EatingTime();
             DyingBecauseOfAge();
             AddAge();
@@ -365,6 +372,8 @@ public class Population : MonoBehaviour
             personDictionary.Remove(key);
         }
 
+        PopupManagerText.SetPopupText(0, $"{keysToRemove.Count} people died of hunger.");
+
         UpdateText();
     }
 
@@ -393,6 +402,7 @@ public class Population : MonoBehaviour
             personDictionary.Remove(key);
         }
 
+        PopupManagerText.SetPopupText(0, $"{keysToRemove.Count} people died of age.");
         UpdateText();
     }
 
@@ -411,11 +421,13 @@ public class Population : MonoBehaviour
         {
             clock.PauseGameClock();
             isTimerStopped = true;
+            PopupManagerText.SetPopupText(0, "Time paused.");
         }
         else
         {
             clock.ResumeGameClock();
             isTimerStopped = false;
+            PopupManagerText.SetPopupText(0, "Time resumed.");
         }
     }
 }

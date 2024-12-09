@@ -1,11 +1,14 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;  // N'oublie pas d'ajouter cette ligne pour utiliser TextMesh Pro
 
 public class PopupManager : MonoBehaviour
 {
     // Liste des CanvasGroups pour les popups
     public CanvasGroup[] popups;
+
+    // Liste des TMP_Text pour chaque popup (TextMesh Pro)
+    public TMP_Text[] popupTexts;
 
     // Durée d'affichage de chaque popup
     public float displayDuration = 5f;
@@ -13,7 +16,6 @@ public class PopupManager : MonoBehaviour
     // Durée de disparition progressive
     public float fadeDuration = 1f;
 
-    private int currentIndex = 0;
     private bool isRunning = false;
 
     void Start()
@@ -28,14 +30,9 @@ public class PopupManager : MonoBehaviour
 
     void Update()
     {
-        // Détecte l'appui sur la barre d'espace pour démarrer ou continuer le cycle
-        if (Input.GetKeyDown(KeyCode.Space) && !isRunning)
-        {
-            StartCoroutine(ShowPopup());
-        }
     }
 
-    IEnumerator ShowPopup()
+    IEnumerator ShowPopup(int currentIndex)
     {
         isRunning = true;
 
@@ -72,5 +69,15 @@ public class PopupManager : MonoBehaviour
         }
 
         popup.alpha = 0f;
+    }
+
+    // Fonction publique pour modifier le texte de la popup actuelle avec TMP_Text
+    public void SetPopupText(int index, string newText)
+    {
+        if (index >= 0 && index < popupTexts.Length)
+        {
+            popupTexts[index].text = newText;
+            StartCoroutine(ShowPopup(index));
+        }
     }
 }

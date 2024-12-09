@@ -85,7 +85,7 @@ public class ResourcesManager : MonoBehaviour
     public void CousumeFood(int food)
     {
         foodCount = Mathf.Max(0, foodCount - food);
-        foodtext.text = foodCount.ToString();
+        foodtext.text = "Food:\n" + foodCount.ToString();
     }
 
     public int GetBuilderCount()
