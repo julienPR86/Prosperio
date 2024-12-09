@@ -24,6 +24,8 @@ public class BuildingSystem : MonoBehaviour
 
     //building tile sprite
     [SerializeField] RuleTile homeTile, farmTile, schoolTile, libraryTile, museumTile;
+    //building in progress tile
+    [SerializeField] RuleTile buildingInProgressTile;
     //building cost data
     [SerializeField] BuildingCostData farmCostData, homeCostData, schoolCostData, libraryCostData, museumCostData;
 
@@ -98,6 +100,9 @@ public class BuildingSystem : MonoBehaviour
 
                     //Spend resources
                     resourcesManager.SpendResource(curBuildingCostData);
+
+                    //Set building in progress tile (to remember to player that a building is in progress at this position)
+                    buildingTilemap.SetTile(curMouseGridPosition, buildingInProgressTile);
 
                     BuildingInProgress curBuilding = new BuildingInProgress(curMouseGridPosition, curBuildingTile, curBuildingCostData.buildingTime, clock.day);
                     buildingsInProgress.Add(curBuilding);
