@@ -21,9 +21,9 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] private BuildingCostData museumCostData;
 
 
-    public TextMeshProUGUI foodtext;
-    public TextMeshProUGUI woodtext;
-    public TextMeshProUGUI stonetext;
+    public TextMeshProUGUI foodText;
+    public TextMeshProUGUI woodText;
+    public TextMeshProUGUI stoneText;
     public TextMeshProUGUI builderText;
 
     public Button buildHomeButton;

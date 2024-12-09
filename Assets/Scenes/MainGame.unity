@@ -1907,17 +1907,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1313b122d16fcae4fbb3ad73273decc4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  circleSprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  stock: {fileID: 341978085}
-  harvestertext: {fileID: 2003006664}
-  lumberjacktext: {fileID: 802812983}
-  diggertext: {fileID: 1665429127}
-  wanderertext: {fileID: 1171890003}
-  masontext: {fileID: 472181044}
-  isTimerStopped: 0
-  PauseButton: {fileID: 2080923558}
   PopupManager: {fileID: 1689287520}
-  prosperityslider: {fileID: 1909097039}
+  circleSprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  populationFolder: {fileID: 0}
+  harvesterText: {fileID: 0}
+  lumberjackText: {fileID: 0}
+  diggerText: {fileID: 0}
+  wandererText: {fileID: 0}
+  masonText: {fileID: 0}
+  isWorking: 0
+  isTimerStopped: 0
 --- !u!114 &763929043
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1967,9 +1966,9 @@ MonoBehaviour:
   schoolCostData: {fileID: 11400000, guid: 593f24e1eddbf6543b3b7b3d84d0816b, type: 2}
   libraryCostData: {fileID: 11400000, guid: 63e107935885e754a9aec8482c87d4d0, type: 2}
   museumCostData: {fileID: 11400000, guid: ab05a26183988384a8a255fcabb34a70, type: 2}
-  foodtext: {fileID: 685857333}
-  woodtext: {fileID: 1444003546}
-  stonetext: {fileID: 981526863}
+  foodText: {fileID: 685857333}
+  woodText: {fileID: 1444003546}
+  stoneText: {fileID: 981526863}
   builderText: {fileID: 472181044}
   buildHomeButton: {fileID: 145832637}
   buildFarmButton: {fileID: 2045205728}

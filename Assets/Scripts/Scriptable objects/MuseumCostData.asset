@@ -15,4 +15,4 @@ MonoBehaviour:
   woodCost: 8
   stoneCost: 5
   builderCost: 2
-  buildingTime: 18
+  buildingTime: 1
