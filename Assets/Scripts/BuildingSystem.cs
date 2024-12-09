@@ -149,22 +149,27 @@ public class BuildingSystem : MonoBehaviour
             case BuildingType.Home:
                 curBuildingCostData = homeCostData;
                 curBuildingTile = homeTile;
+                Debug.Log("Home");
                 break;
             case BuildingType.Farm:
                 curBuildingCostData = farmCostData;
                 curBuildingTile = farmTile;
+                Debug.Log("Farm");
                 break;
             case BuildingType.School:
                 curBuildingCostData = schoolCostData;
                 curBuildingTile = schoolTile;
+                Debug.Log("School");
                 break;
             case BuildingType.Library:
                 curBuildingCostData = libraryCostData;
                 curBuildingTile = libraryTile;
+                Debug.Log("Library");
                 break;
             case BuildingType.Museum:
                 curBuildingCostData = museumCostData;
                 curBuildingTile = museumTile;
+                Debug.Log("Museum");
                 break;
             default:
                 return;
@@ -186,6 +191,23 @@ public class BuildingSystem : MonoBehaviour
         //active preview mode
         previewMode = true;
     }
+
+    /// <summary>
+    /// Method to handle button click event
+    /// </summary>
+    /// <param name="buildingTypeString"></param>
+    public void OnBuildButtonClicked(string buildingTypeString)
+    {
+        if (System.Enum.TryParse(buildingTypeString, out BuildingType buildingType))
+        {
+            InitBuilding(buildingType);
+        }
+        else
+        {
+            Debug.LogError("Invalid building type: " + buildingTypeString);
+        }
+    }
+
 
     /// <summary>
     /// Check if building on current tile is possible
