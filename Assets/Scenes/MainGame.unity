@@ -401,9 +401,8 @@ GameObject:
   - component: {fileID: 145832639}
   - component: {fileID: 145832638}
   - component: {fileID: 145832637}
-  - component: {fileID: 145832636}
   m_Layer: 5
-  m_Name: Button
+  m_Name: HouseBuild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -429,18 +428,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -47}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &145832636
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 145832634}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7adb7516ef8d08447b631931e67b5876, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &145832637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -454,7 +441,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -485,16 +472,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 145832636}
-        m_TargetAssemblyTypeName: ButtonClickScript, Assembly-CSharp
-        m_MethodName: OnButtonClick
-        m_Mode: 1
+      - m_Target: {fileID: 763929043}
+        m_TargetAssemblyTypeName: BuildingSystem, Assembly-CSharp
+        m_MethodName: OnBuildButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Home
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &145832638
@@ -1572,7 +1559,7 @@ GameObject:
   - component: {fileID: 634515996}
   - component: {fileID: 634515995}
   m_Layer: 5
-  m_Name: Button (4)
+  m_Name: MuseumBuild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1623,7 +1610,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -1654,16 +1641,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 634515995}
-        m_TargetAssemblyTypeName: ButtonClickScript, Assembly-CSharp
-        m_MethodName: OnButtonClick
-        m_Mode: 1
+      - m_Target: {fileID: 763929043}
+        m_TargetAssemblyTypeName: BuildingSystem, Assembly-CSharp
+        m_MethodName: OnBuildButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Museum
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &634515997
@@ -1975,10 +1962,20 @@ MonoBehaviour:
   stoneCount: 10
   foodCount: 10
   builderCount: 5
+  homeCostData: {fileID: 11400000, guid: 860ad549811797c4e85f4c7dd48455f9, type: 2}
+  farmCostData: {fileID: 11400000, guid: 800181dcd0979774dab1740ee914cfcc, type: 2}
+  schoolCostData: {fileID: 11400000, guid: 593f24e1eddbf6543b3b7b3d84d0816b, type: 2}
+  libraryCostData: {fileID: 11400000, guid: 63e107935885e754a9aec8482c87d4d0, type: 2}
+  museumCostData: {fileID: 11400000, guid: ab05a26183988384a8a255fcabb34a70, type: 2}
   foodtext: {fileID: 685857333}
   woodtext: {fileID: 1444003546}
   stonetext: {fileID: 981526863}
   builderText: {fileID: 472181044}
+  buildHomeButton: {fileID: 145832637}
+  buildFarmButton: {fileID: 2045205728}
+  buildSchoolButton: {fileID: 1061252323}
+  buildLibraryButton: {fileID: 1871306827}
+  buildMuseumButton: {fileID: 634515996}
 --- !u!1 &802812981
 GameObject:
   m_ObjectHideFlags: 0
@@ -4173,7 +4170,7 @@ GameObject:
   - component: {fileID: 1061252323}
   - component: {fileID: 1061252322}
   m_Layer: 5
-  m_Name: Button (2)
+  m_Name: SchoolBuild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4224,7 +4221,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -4255,16 +4252,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1061252322}
-        m_TargetAssemblyTypeName: ButtonClickScript, Assembly-CSharp
-        m_MethodName: OnButtonClick
-        m_Mode: 1
+      - m_Target: {fileID: 763929043}
+        m_TargetAssemblyTypeName: BuildingSystem, Assembly-CSharp
+        m_MethodName: OnBuildButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: School
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1061252324
@@ -6319,7 +6316,7 @@ GameObject:
   - component: {fileID: 1871306827}
   - component: {fileID: 1871306826}
   m_Layer: 5
-  m_Name: Button (3)
+  m_Name: LibraryBuild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6370,7 +6367,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -6401,16 +6398,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1871306826}
-        m_TargetAssemblyTypeName: ButtonClickScript, Assembly-CSharp
-        m_MethodName: OnButtonClick
-        m_Mode: 1
+      - m_Target: {fileID: 763929043}
+        m_TargetAssemblyTypeName: BuildingSystem, Assembly-CSharp
+        m_MethodName: OnBuildButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Library
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &1871306828
@@ -6982,7 +6979,7 @@ GameObject:
   - component: {fileID: 2045205728}
   - component: {fileID: 2045205727}
   m_Layer: 5
-  m_Name: Button (1)
+  m_Name: FarmBuild
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7033,7 +7030,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Navigation:
-    m_Mode: 3
+    m_Mode: 0
     m_WrapAround: 0
     m_SelectOnUp: {fileID: 0}
     m_SelectOnDown: {fileID: 0}
@@ -7064,16 +7061,16 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2045205727}
-        m_TargetAssemblyTypeName: ButtonClickScript, Assembly-CSharp
-        m_MethodName: OnButtonClick
-        m_Mode: 1
+      - m_Target: {fileID: 763929043}
+        m_TargetAssemblyTypeName: BuildingSystem, Assembly-CSharp
+        m_MethodName: OnBuildButtonClicked
+        m_Mode: 5
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: 
+          m_StringArgument: Farm
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &2045205729

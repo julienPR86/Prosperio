@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Resources;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -13,10 +14,23 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] private int foodCount = 10;
     [SerializeField] private int builderCount = 5;
 
+    [SerializeField] private BuildingCostData homeCostData;
+    [SerializeField] private BuildingCostData farmCostData;
+    [SerializeField] private BuildingCostData schoolCostData;
+    [SerializeField] private BuildingCostData libraryCostData;
+    [SerializeField] private BuildingCostData museumCostData;
+
+
     public TextMeshProUGUI foodtext;
     public TextMeshProUGUI woodtext;
     public TextMeshProUGUI stonetext;
     public TextMeshProUGUI builderText;
+
+    public Button buildHomeButton;
+    public Button buildFarmButton;
+    public Button buildSchoolButton;
+    public Button buildLibraryButton;
+    public Button buildMuseumButton;
 
     /// <summary>
     /// Will be used to update Building UI, at the end of day(after gathering) AND after building
@@ -30,6 +44,17 @@ public class ResourcesManager : MonoBehaviour
         woodtext.text = "Wood:\n" + woodCount.ToString();
         stonetext.text = "Stone:\n" + stoneCount.ToString();
     }
+
+    /// <summary>
+    /// Update the build buttons interactable state
+    /// </summary>
+    void Update()
+    {
+        UpdateBuildButtons(homeCostData, farmCostData, schoolCostData, libraryCostData, museumCostData);
+    }
+
+
+
     public bool HasEnoughResources(BuildingCostData costData)
     {
         return (woodCount >= costData.woodCost &&
@@ -51,6 +76,25 @@ public class ResourcesManager : MonoBehaviour
 
         builderCount = Mathf.Max(0, builderCount - costData.builderCost);
         builderText.text = builderCount.ToString();
+    }
+
+
+
+    /// <summary>
+    /// Update the build buttons interactable state
+    /// </summary>
+    /// <param name="homeCost"></param>
+    /// <param name="farmCost"></param>
+    /// <param name="schoolCost"></param>
+    /// <param name="libraryCost"></param>
+    /// <param name="museumCost"></param>
+    public void UpdateBuildButtons(BuildingCostData homeCost, BuildingCostData farmCost, BuildingCostData schoolCost, BuildingCostData libraryCost, BuildingCostData museumCost)
+    {
+        buildHomeButton.interactable = HasEnoughResources(homeCost);
+        buildFarmButton.interactable = HasEnoughResources(farmCost);
+        buildSchoolButton.interactable = HasEnoughResources(schoolCost);
+        buildLibraryButton.interactable = HasEnoughResources(libraryCost);
+        buildMuseumButton.interactable = HasEnoughResources(museumCost);
     }
 
     //Getting resources methods
