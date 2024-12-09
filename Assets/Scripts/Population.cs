@@ -410,7 +410,7 @@ public class Population : MonoBehaviour
         List<GameObject> keysToRemove = new List<GameObject>();
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
         {
-            if (person.Value.age >= 4)
+            if (person.Value.age >= 25)
             {
                 keysToRemove.Add(person.Key);
                 Destroy(person.Key.gameObject);
