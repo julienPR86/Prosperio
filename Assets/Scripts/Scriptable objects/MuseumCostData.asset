@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   woodCost: 8
   stoneCost: 5
-  builderCost: 0
+  builderCost: 2
   buildingTime: 18

@@ -124,7 +124,7 @@ public class BuildingSystem : MonoBehaviour
         }
 
         //---------------------  Input for tests
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.B))
         {
             InitBuilding(BuildingType.Farm);
         }
