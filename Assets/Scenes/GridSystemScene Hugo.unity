@@ -1366,6 +1366,7 @@ MonoBehaviour:
   wanderertext: {fileID: 1171890003}
   masontext: {fileID: 472181044}
   isTimerStopped: 0
+  PauseButton: {fileID: 2080923558}
 --- !u!114 &763929043
 MonoBehaviour:
   m_ObjectHideFlags: 0
