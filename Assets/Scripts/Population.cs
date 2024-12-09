@@ -25,6 +25,8 @@ public class Population : MonoBehaviour
     public Button PauseButton;
     public GameObject PopupManager;
     private PopupManager PopupManagerText;
+    public Slider prosperityslider;
+    private int numberofdeadday = 0;
 
     void Start()
     {
@@ -41,13 +43,15 @@ public class Population : MonoBehaviour
         CreateGameObject(Job.Digger);
         CreateGameObject(Job.Mason);
         PauseButton.onClick.AddListener(PauseGame);
+
+        prosperityslider.value = 10;
     }
 
     private void Update()
     {
         if (clock.GetTime() == 360 && !isWorking)
         {
-            PopupManagerText.SetPopupText(1, "Workers go to work!");
+            PopupManagerText.SetPopupText(2, "Workers go to work!");
             isWorking = true;
             StopAllCoroutines();
             GoToWork(Job.Harvester);
@@ -57,7 +61,7 @@ public class Population : MonoBehaviour
         }
         if (clock.GetTime() == 0 && isWorking)
         {
-            PopupManagerText.SetPopupText(1, "Workers go to sleep!");
+            PopupManagerText.SetPopupText(2, "Workers go to sleep!");
             isWorking = false;
             StopAllCoroutines();
             DaysPassed++;
@@ -66,12 +70,13 @@ public class Population : MonoBehaviour
                 DaysPassed = 0;
                 CreateGameObject(Job.Wanderer);
                 CreateGameObject(Job.Wanderer);
-                PopupManagerText.SetPopupText(2, "2 Wanderers appeared!");
+                PopupManagerText.SetPopupText(1, "2 Wanderers appeared!");
             }
             //GoToHouse();
             EatingTime();
-            DyingBecauseOfAge();
             AddAge();
+            DyingBecauseOfAge();
+            UpdateProsperity();
         }
     }
     private void SpawnPerson(Person persontospawn)
@@ -259,6 +264,7 @@ public class Population : MonoBehaviour
 
             if (!isTimerStopped)
             {
+                yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
                 switch (job)
                 {
                     case Job.Harvester:
@@ -331,22 +337,26 @@ public class Population : MonoBehaviour
 
         foreach (KeyValuePair<GameObject, Person> person in personDictionary) // Placing every person to a house if this one is not full, else, the person will be tired
         {
-            if (houses.Count > 0 || houses[i] != null)
+            if (person.Value.job != Job.Wanderer)
             {
-                if (!houses[i].isFull)
+                if (houses.Count > 0 || houses[i] != null)
                 {
-                    houses[i].AddPeople();
-                    person.Value.isTired = false;
-                    GoHere(person.Key, houses[i].WorldPosition);
+                    if (!houses[i].isFull)
+                    {
+                        houses[i].AddPeople();
+                        person.Value.isTired = false;
+                        GoHere(person.Key, houses[i].WorldPosition);
+                    }
+                    else
+                    {
+                        i++;
+                    }
                 }
                 else
                 {
-                    i++;
+                    person.Value.isTired = true;
+                    PopupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
                 }
-            }
-            else
-            {
-                person.Value.isTired = true;
             }
         }
     }
@@ -370,6 +380,7 @@ public class Population : MonoBehaviour
         foreach (GameObject key in keysToRemove)
         {
             personDictionary.Remove(key);
+            numberofdeadday++;
         }
 
         PopupManagerText.SetPopupText(0, $"{keysToRemove.Count} people died of hunger.");
@@ -400,6 +411,7 @@ public class Population : MonoBehaviour
         foreach (GameObject key in keysToRemove)
         {
             personDictionary.Remove(key);
+            numberofdeadday++;
         }
 
         PopupManagerText.SetPopupText(0, $"{keysToRemove.Count} people died of age.");
@@ -429,5 +441,22 @@ public class Population : MonoBehaviour
             isTimerStopped = false;
             PopupManagerText.SetPopupText(0, "Time resumed.");
         }
+    }
+
+    private void UpdateProsperity()
+    {
+        foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+        {
+            if (!person.Value.isTired)
+            {
+                prosperityslider.value += 1;
+            }
+            else
+            {
+                prosperityslider.value -= 1;
+            }
+        }
+
+        prosperityslider.value -= numberofdeadday;
     }
 }
