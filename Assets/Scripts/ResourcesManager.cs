@@ -12,9 +12,11 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] private int stoneCount = 10;
     [SerializeField] private int foodCount = 10;
     [SerializeField] private int builderCount = 5;
+
     public TextMeshProUGUI foodtext;
     public TextMeshProUGUI woodtext;
     public TextMeshProUGUI stonetext;
+    public TextMeshProUGUI builderText;
 
     /// <summary>
     /// Will be used to update Building UI, at the end of day(after gathering) AND after building
@@ -42,8 +44,13 @@ public class ResourcesManager : MonoBehaviour
     public void SpendResource(BuildingCostData costData)
     {
         woodCount = Mathf.Max(0, woodCount - costData.woodCost);
+        woodtext.text = "Wood:\n" + woodCount.ToString();
+
         stoneCount = Mathf.Max(0, stoneCount - costData.stoneCost);
+        stonetext.text = "Stone:\n" + stoneCount.ToString();
+
         builderCount = Mathf.Max(0, builderCount - costData.builderCost);
+        builderText.text = builderCount.ToString();
     }
 
     //Getting resources methods
