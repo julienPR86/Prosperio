@@ -4,11 +4,9 @@ using UnityEngine;
 
 public class Person
 {
-    private int age { get; set; }
+    public int age { get; set; }
     public Job job {  get; set; }
-    private bool isTired { get; set; }
-
-    private GameObject personobject;
+    public bool isTired { get; set; }
 
     public Person(Job job = Job.Wanderer, int age = 1, bool isTired = false)
     {

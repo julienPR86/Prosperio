@@ -8,8 +8,9 @@ public class ManageClock : MonoBehaviour
     private int second = 0;
     public int day = 1;
     private float elapsedTime = 0f;
-    private float speed = 10000;
+    public float speed = 10000;
     public TextMeshProUGUI textClock;
+    private bool StopTimer;
 
     void Start()
     {
@@ -25,27 +26,30 @@ public class ManageClock : MonoBehaviour
 
     private void UpdateClock()
     {
-        second++;
-
-        if (second >= 60)
+        if (!StopTimer) 
         {
-            minute++;
-            second = 0;
-        }
+            second++;
 
-        if (minute >= 60)
-        {
-            hour++;
-            minute = 0;
-        }
+            if (second >= 60)
+            {
+                minute++;
+                second = 0;
+            }
 
-        if (hour >= 24)
-        {
-            hour = 0;
-            day++;
-        }
+            if (minute >= 60)
+            {
+                hour++;
+                minute = 0;
+            }
 
-        UpdateClockText();
+            if (hour >= 24)
+            {
+                hour = 0;
+                day++;
+            }
+
+            UpdateClockText();
+        }
     }
 
     private void UpdateClockText()
@@ -62,5 +66,20 @@ public class ManageClock : MonoBehaviour
     public int GetTime() // Renvoit l'heure actuelle en minutes
     {
         return hour * 60 + minute;
+    }
+
+    public float GetRealSecondsPerInGameHour()
+    {
+        return 3600f / speed; // Real-world seconds for one in-game hour
+    }
+
+    public void PauseGameClock()
+    {
+        StopTimer = true;
+    }
+
+    public void ResumeGameClock()
+    {
+        StopTimer = false;
     }
 }

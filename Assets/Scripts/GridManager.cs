@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static Cell;
@@ -13,6 +14,9 @@ public class GridManager : MonoBehaviour
 
     //Cells grid
     public Cell[,] cells;
+    public List<Cell> forestcells = new List<Cell>();
+    public List<Cell> stonecells = new List<Cell>();
+    public List<Cell> berriescells = new List<Cell>();
 
     //tile sprite references
     [SerializeField] RuleTile plainTile, forestTile, stoneTile, berriesTile;
@@ -64,8 +68,7 @@ public class GridManager : MonoBehaviour
 
                 Vector3Int cellPosition = new Vector3Int(x, y, 0);
                 Vector3 cellnotcentered = tilemap.CellToWorld(cellPosition);
-                Vector3 tileCentered = new Vector3(tilemap.cellSize.x / 2, tilemap.cellSize.y / 2, 0); // Permet de référencer le milieu de la cellule
-                Vector3 worldPosition = cellnotcentered + tileCentered;
+                Vector3 worldPosition = cellnotcentered + new Vector3(tilemap.cellSize.x / 2f, tilemap.cellSize.y / 2f, 0);
 
                 //--------------------------------------
 
@@ -80,12 +83,15 @@ public class GridManager : MonoBehaviour
                 switch (typeOfTerrain)
                 {
                     case TypeOfTerrain.Forest:
+                        forestcells.Add(cells[x, y]); // On stocke la cellule dans la liste correspondante à son terrain
                         tile = forestTile;
                         break;
                     case TypeOfTerrain.Stone:
+                        stonecells.Add(cells[x, y]);
                         tile = stoneTile;
                         break;
                     case TypeOfTerrain.Berries:
+                        berriescells.Add(cells[x, y]);
                         tile = berriesTile;
                         break;
                     default:
