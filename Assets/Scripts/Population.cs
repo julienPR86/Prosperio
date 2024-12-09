@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using static Person;
 
 public class Population : MonoBehaviour
@@ -14,6 +16,13 @@ public class Population : MonoBehaviour
     private ResourcesManager resourcesManager;
     private int DaysPassed = 0;
     private Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
+    public TextMeshProUGUI harvestertext;
+    public TextMeshProUGUI lumberjacktext;
+    public TextMeshProUGUI diggertext;
+    public TextMeshProUGUI wanderertext;
+    public TextMeshProUGUI masontext;
+    public bool isTimerStopped = false;
+    public Button PauseButton;
     void Start()
     {
         gridManager = GetComponent<GridManager>();
@@ -24,10 +33,10 @@ public class Population : MonoBehaviour
         CreateGameObject(Job.Wanderer);
         CreateGameObject(Job.Wanderer);
         CreateGameObject(Job.Harvester);
-        CreateGameObject(Job.Harvester);
         CreateGameObject(Job.Lumberjack);
         CreateGameObject(Job.Digger);
         CreateGameObject(Job.Mason);
+        PauseButton.onClick.AddListener(PauseGame);
     }
 
     private void Update()
@@ -102,6 +111,7 @@ public class Population : MonoBehaviour
         }
 
         personDictionary.Add(personobject, person);
+        UpdateText();
     }
 
     private void GoToWork(Job job)
@@ -171,20 +181,23 @@ public class Population : MonoBehaviour
 
     private IEnumerator MoveToTarget(GameObject o, Vector3 location, float speed)
     {
-        while (Vector3.Distance(o.transform.position, location) > 0.1f) // While still not having reached the destination
+        while (Vector3.Distance(o.transform.position, location) > 0.1f)
         {
-            // Calculate the direction to the target location
-            Vector3 direction = (location - o.transform.position).normalized;
+            // Pause if the game is paused
+            while (isTimerStopped)
+            {
+                yield return null; // Wait until the game is resumed
+            }
 
-            // Move the object towards the target
+            Vector3 direction = (location - o.transform.position).normalized;
             o.transform.position += direction * speed * Time.deltaTime;
 
             yield return null;
         }
 
-        // If object is close, setting it at the location
         o.transform.position = location;
     }
+
 
     private void StartWalkingAround()
     {
@@ -204,44 +217,57 @@ public class Population : MonoBehaviour
         }
     }
 
-    private IEnumerator WalkRandomly(GameObject person) // Coroutine to make the wanderers and tired people walking around
+    private IEnumerator WalkRandomly(GameObject person)
     {
         while (true)
         {
-            // Randomly pick a location
+            while (isTimerStopped)
+            {
+                yield return null; // Wait until the game is resumed
+            }
+
             int randomX = Random.Range(0, gridManager.width);
             int randomY = Random.Range(0, gridManager.height);
 
             Vector3 randomLocation = gridManager.cells[randomX, randomY].WorldPosition;
 
-            // Move the wanderer to the new random location
-            yield return MoveToTarget(person, randomLocation, 3f); // Adjust speed as needed
+            yield return MoveToTarget(person, randomLocation, 3f);
 
-            float waitTime = Random.Range(1f, 3f); // Repeat after waiting X seconds
+            float waitTime = Random.Range(1f, 3f);
             yield return new WaitForSeconds(waitTime);
         }
     }
 
+
     private IEnumerator GatherResource(Job job, int interval)
     {
-        while (isWorking) // Continue gathering resources while working
+        while (isWorking)
         {
+            while (isTimerStopped)
+            {
+                yield return null; // Wait until the game is resumed
+            }
+
             yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
 
-            switch (job)
+            if (!isTimerStopped)
             {
-                case Job.Harvester:
-                    resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester));
-                    break;
-                case Job.Lumberjack:
-                    resourcesManager.AddWood(1 * GetActiveWorkers(Job.Lumberjack));
-                    break;
-                case Job.Digger:
-                    resourcesManager.AddStone(1 * GetActiveWorkers(Job.Lumberjack));
-                    break;
+                switch (job)
+                {
+                    case Job.Harvester:
+                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester));
+                        break;
+                    case Job.Lumberjack:
+                        resourcesManager.AddWood(1 * GetActiveWorkers(Job.Lumberjack));
+                        break;
+                    case Job.Digger:
+                        resourcesManager.AddStone(1 * GetActiveWorkers(Job.Digger));
+                        break;
+                }
             }
         }
     }
+
 
     private int GetActiveWorkers(Job job)
     {
@@ -338,6 +364,8 @@ public class Population : MonoBehaviour
         {
             personDictionary.Remove(key);
         }
+
+        UpdateText();
     }
 
     private void AddAge()
@@ -363,6 +391,31 @@ public class Population : MonoBehaviour
         foreach (GameObject key in keysToRemove)
         {
             personDictionary.Remove(key);
+        }
+
+        UpdateText();
+    }
+
+    private void UpdateText()
+    {
+        harvestertext.text = stock.transform.Find("Harvesters").transform.childCount.ToString();
+        lumberjacktext.text = stock.transform.Find("Lumberjacks").transform.childCount.ToString();
+        diggertext.text = stock.transform.Find("Diggers").transform.childCount.ToString();
+        masontext.text = stock.transform.Find("Masons").transform.childCount.ToString();
+        wanderertext.text = stock.transform.Find("Wanderers").transform.childCount.ToString();
+    }
+
+    private void PauseGame()
+    {
+        if (!isTimerStopped) 
+        {
+            clock.PauseGameClock();
+            isTimerStopped = true;
+        }
+        else
+        {
+            clock.ResumeGameClock();
+            isTimerStopped = false;
         }
     }
 }
