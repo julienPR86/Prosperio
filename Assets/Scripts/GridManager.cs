@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using static Cell;
@@ -5,18 +6,21 @@ using static Cell;
 public class GridManager : MonoBehaviour
 {
     //Grid dimensions
-    [SerializeField] private int width = 20;
-    [SerializeField] private int height = 20;
+    public int width;
+    public int height;
 
     //Tilemap reference
     [SerializeField] Tilemap tilemap;
 
     //Cells grid
-    Cell[,] cells;
+    public Cell[,] cells;
+    public List<Cell> forestcells = new List<Cell>();
+    public List<Cell> stonecells = new List<Cell>();
+    public List<Cell> berriescells = new List<Cell>();
 
     //tile sprite references
     [SerializeField] RuleTile plainTile, forestTile, stoneTile, berriesTile;
-
+    
 
     void Start()
     {
@@ -61,9 +65,14 @@ public class GridManager : MonoBehaviour
                 {
                     typeOfTerrain = TypeOfTerrain.Stone;
                 }
-                //---------------------------------------
 
-                cells[x, y] = new Cell(x, y, typeOfTerrain);
+                Vector3Int cellPosition = new Vector3Int(x, y, 0);
+                Vector3 cellnotcentered = tilemap.CellToWorld(cellPosition);
+                Vector3 worldPosition = cellnotcentered + new Vector3(tilemap.cellSize.x / 2f, tilemap.cellSize.y / 2f, 0);
+
+                //--------------------------------------
+
+                cells[x, y] = new Cell(x, y, typeOfTerrain, worldPosition);
 
                 //----- VISUAL PART
 
@@ -74,12 +83,15 @@ public class GridManager : MonoBehaviour
                 switch (typeOfTerrain)
                 {
                     case TypeOfTerrain.Forest:
+                        forestcells.Add(cells[x, y]); // On stocke la cellule dans la liste correspondante à son terrain
                         tile = forestTile;
                         break;
                     case TypeOfTerrain.Stone:
+                        stonecells.Add(cells[x, y]);
                         tile = stoneTile;
                         break;
                     case TypeOfTerrain.Berries:
+                        berriescells.Add(cells[x, y]);
                         tile = berriesTile;
                         break;
                     default:

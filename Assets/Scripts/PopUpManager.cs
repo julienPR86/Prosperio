@@ -10,19 +10,18 @@ public class PopupManager : MonoBehaviour
     // Liste des TMP_Text pour chaque popup (TextMesh Pro)
     public TMP_Text[] popupTexts;
 
-    // Durée d'affichage de chaque popup
+    // Durï¿½e d'affichage de chaque popup
     public float displayDuration = 5f;
 
-    // Durée de disparition progressive
+    // Durï¿½e de disparition progressive
     public float fadeDuration = 1f;
 
-    private int currentIndex = 0;
     private bool isRunning = false;
 
     void Start()
     {
         SetPopupText(0, "Bienvenue dans le jeu !");
-        // Assure que toutes les popups sont désactivées et invisibles au départ
+        // Assure que toutes les popups sont dï¿½sactivï¿½es et invisibles au dï¿½part
         foreach (var popup in popups)
         {
             popup.gameObject.SetActive(false);
@@ -32,14 +31,9 @@ public class PopupManager : MonoBehaviour
 
     void Update()
     {
-        // Détecte l'appui sur la barre d'espace pour démarrer ou continuer le cycle
-        if (Input.GetKeyDown(KeyCode.Space) && !isRunning)
-        {
-            StartCoroutine(ShowPopup());
-        }
     }
 
-    IEnumerator ShowPopup()
+    IEnumerator ShowPopup(int currentIndex)
     {
         isRunning = true;
 
@@ -48,16 +42,16 @@ public class PopupManager : MonoBehaviour
         currentPopup.gameObject.SetActive(true);
         currentPopup.alpha = 1f;
 
-        // Attend la durée d'affichage
+        // Attend la durï¿½e d'affichage
         yield return new WaitForSeconds(displayDuration - fadeDuration);
 
         // Lance la disparition progressive
         yield return StartCoroutine(FadeOut(currentPopup));
 
-        // Désactive la popup après le fade-out
+        // Dï¿½sactive la popup aprï¿½s le fade-out
         currentPopup.gameObject.SetActive(false);
 
-        // Passe à la popup suivante, ou revient à la première si on a fini le cycle
+        // Passe ï¿½ la popup suivante, ou revient ï¿½ la premiï¿½re si on a fini le cycle
         currentIndex = (currentIndex + 1) % popups.Length;
 
         isRunning = false;
@@ -84,6 +78,7 @@ public class PopupManager : MonoBehaviour
         if (index >= 0 && index < popupTexts.Length)
         {
             popupTexts[index].text = newText;
+            StartCoroutine(ShowPopup(index));
         }
     }
 }
