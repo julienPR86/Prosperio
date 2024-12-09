@@ -8,7 +8,7 @@ public class ManageClock : MonoBehaviour
     private int second = 0;
     public int day = 1;
     private float elapsedTime = 0f;
-    public float speed = 10000;
+    public float speed = 1000f;
     public TextMeshProUGUI textClock;
     private bool StopTimer;
 

@@ -253,6 +253,9 @@ public class Population : MonoBehaviour
 
     private IEnumerator GatherResource(Job job, int interval)
     {
+        float elapsedTime = 0f;
+        float targetTime = clock.GetRealSecondsPerInGameHour() * interval;
+
         while (isWorking)
         {
             while (isTimerStopped)
@@ -260,11 +263,14 @@ public class Population : MonoBehaviour
                 yield return null; // Wait until the game is resumed
             }
 
-            yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
+            // Increment elapsed time based on real-time passage
+            elapsedTime += Time.deltaTime;
 
-            if (!isTimerStopped)
+            // Check if the elapsed time has reached or exceeded the target time
+            if (elapsedTime >= targetTime)
             {
-                yield return new WaitForSeconds(clock.GetRealSecondsPerInGameHour() * interval);
+                elapsedTime = 0f; // Reset elapsed time
+
                 switch (job)
                 {
                     case Job.Harvester:
@@ -278,8 +284,11 @@ public class Population : MonoBehaviour
                         break;
                 }
             }
+
+            yield return null; // Wait until the next frame
         }
     }
+
 
 
     private int GetActiveWorkers(Job job)
