@@ -22,7 +22,6 @@ public class GameManagement : MonoBehaviour
     private int workTime = 360;
     private int sleepTime = 0;
 
-
     private int daysPassed = 0; // Useful to spawn 2 wanderers every two days
 
     // Some booleans to avoid functions in update being called multiple times
@@ -59,13 +58,13 @@ public class GameManagement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (clock.GetTime() == workTime && !isWorking) 
+        if (clock.GetTime() == workTime && !isWorking)
         {
             //Update buildings in progress list
-            if (buildingSystem != null) 
+            if (buildingSystem != null)
             {
                 buildingSystem.UpdateBuildingsInProgress();
-            } 
+            }
 
             popupManagerText.SetPopupText(2, "Workers go to work!");
             population.ResetDeadNumber();
@@ -89,7 +88,7 @@ public class GameManagement : MonoBehaviour
             isWorking = false;
             population.isWorking = isWorking;
 
-            population.StopAllCoroutines(); 
+            population.StopAllCoroutines();
 
             daysPassed++;
             if (daysPassed == 2) // Spawn of wanderers every 2 days.
@@ -148,3 +147,4 @@ public class GameManagement : MonoBehaviour
         prosperitySlider.value += 3 * museumCount;
     }
 }
+

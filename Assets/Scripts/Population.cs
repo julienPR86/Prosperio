@@ -303,7 +303,7 @@ public class Population : MonoBehaviour
                 switch (job)
                 {
                     case Job.Harvester:
-                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester));
+                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester) * Mathf.Max(1, GetNumberOfFarms()));
                         break;
                     case Job.Lumberjack:
                         resourcesManager.AddWood(1 * GetActiveWorkers(Job.Lumberjack));
@@ -316,6 +316,20 @@ public class Population : MonoBehaviour
 
             yield return null; // Wait until the next frame
         }
+    }
+
+    private int GetNumberOfFarms() // Return the number of farms
+    {
+        int numberOfFarms = 0;
+        foreach (Cell cell in gridManager.cells)
+        {
+            if (cell.buildingInCell == Cell.BuildingType.Farm)
+            {
+                numberOfFarms++;
+            }
+        }
+
+        return numberOfFarms;
     }
 
 
@@ -434,7 +448,7 @@ public class Population : MonoBehaviour
             numberOfDeadToday++;
         }
 
-        if (peopleToRemove.Count > 0) 
+        if (peopleToRemove.Count > 0)
         {
             popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of hunger.");
         }
@@ -486,7 +500,7 @@ public class Population : MonoBehaviour
 
     public void PauseGame()
     {
-        if (!isTimerStopped) 
+        if (!isTimerStopped)
         {
             clock.PauseGameClock();
             isTimerStopped = true;
