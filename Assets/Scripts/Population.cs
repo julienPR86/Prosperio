@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.UIElements;
 using static Person;
 
 public class Population : MonoBehaviour
@@ -19,9 +18,13 @@ public class Population : MonoBehaviour
     // UI elements + gameobjects needed
     public Sprite circleSprite;
     public GameObject populationFolder; // Contains empty objects acting like folders to stock Wanderers, Lumberjacks etc gameobjects
+    public GameObject unitPanelPrefab;
 
     // Link ALL the gameObjects (key) to an instance of Person class (Value)
     public Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
+
+    //Dictionary that contain all persons at school
+    public Dictionary<Person, Job> personAtSchool = new Dictionary<Person, Job>();
 
     // To update number of workers per category in the UI
     public TextMeshProUGUI harvesterText;
@@ -44,12 +47,31 @@ public class Population : MonoBehaviour
 
     public void CreateGameObject(Job job)
     {
+        GameObject toggleGroupObject = GameObject.Find("Population");
         GameObject personObject = new GameObject();
         personObject.transform.position = new Vector3(5, 5);
         personObject.transform.localScale = new Vector3(0.3f, 0.3f);
         SpriteRenderer spriteRenderer = personObject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = circleSprite;
+        Toggle toggle = personObject.AddComponent<Toggle>();
+        Image toggleImage = personObject.AddComponent<Image>();
         Person person = null;
+
+        GameObject unitPanel = Instantiate(unitPanelPrefab, personObject.transform);
+        unitPanel.GetComponent<RectTransform>().anchoredPosition = new Vector2(6f, 0f);
+        unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f);
+        unitPanel.SetActive(true);
+
+        TogglePanelControl toggleControl = personObject.AddComponent<TogglePanelControl>();
+        toggleControl.targetToggle = toggle;
+        toggleControl.panelToControl = unitPanel;
+
+        // toggle navigation to none
+        toggleImage.sprite = circleSprite;
+        toggle.navigation = new Navigation { mode = Navigation.Mode.None };
+        toggle.image = toggleImage;
+        toggle.group = toggleGroupObject.GetComponent<ToggleGroup>();
+        toggle.onValueChanged.AddListener(isOn => OnToggleValueChanged(unitPanel, isOn));
 
         switch (job)
         {
@@ -82,6 +104,18 @@ public class Population : MonoBehaviour
 
         personDictionary.Add(personObject, person);
         UpdateText();
+    }
+
+    private void OnToggleValueChanged(GameObject unitPanel, bool isOn)
+    {
+        if (unitPanel != null)
+        {
+            unitPanel.SetActive(isOn);
+        }
+        else
+        {
+            Debug.LogWarning("Panel non assigné, impossible de le manipuler!");
+        }
     }
 
     public void GoToWork(Job job)
@@ -319,7 +353,7 @@ public class Population : MonoBehaviour
         {
             foreach (KeyValuePair<GameObject, Person> person in personDictionary)
             {
-                if (person.Value.job != Job.Wanderer)
+                if (person.Value.job != Job.Wanderer || person.Value.atSchool)
                 {
                     person.Value.isTired = true;
                     popupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
@@ -330,7 +364,7 @@ public class Population : MonoBehaviour
 
         foreach (KeyValuePair<GameObject, Person> person in personDictionary) // Placing every person to a house if this one is not full, else, the person will be tired
         {
-            if (person.Value.job != Job.Wanderer)
+            if (person.Value.job != Job.Wanderer || person.Value.atSchool)
             {
                 if (houses.Count > 0 || houses[i] != null)
                 {
@@ -450,5 +484,12 @@ public class Population : MonoBehaviour
     public void ResetDeadNumber()
     {
         numberOfDeadToday = 0;
+    }
+
+    //Méthod to send someone at school (with target job)
+    public void SendToSchool(Person person, Job job)
+    {
+        person.atSchool = true;
+        personAtSchool.Add(person, job);
     }
 }
