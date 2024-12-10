@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Resources;
 using TMPro.Examples;
+using UnityEditor.MPE;
 using UnityEngine;
 using UnityEngine.UI;
 using static Person;
@@ -12,6 +13,7 @@ public class GameManagement : MonoBehaviour
     private Population population;
     private ResourcesManager resourcesManager;
     private PopupManager popupManagerText;
+    private GridManager gridManager;
 
     // GameObjects needed
     public GameObject popupManager; // that contains PopupManager Script
@@ -37,6 +39,7 @@ public class GameManagement : MonoBehaviour
         resourcesManager = GetComponent<ResourcesManager>();
         population = GetComponent<Population>();
         popupManagerText = popupManager.GetComponent<PopupManager>();
+        gridManager = GetComponent <GridManager>();
 
         // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
         population.CreateGameObject(Job.Wanderer);
@@ -106,6 +109,21 @@ public class GameManagement : MonoBehaviour
 
     private void UpdateProsperity()
     {
+        int museumCount = 0;
+        int libraryCount = 0;
+
+        foreach (Cell cell in gridManager.cells)
+        {
+            if (cell.buildingInCell == Cell.BuildingType.Library)
+            {
+                libraryCount++;
+            }
+            if (cell.buildingInCell == Cell.BuildingType.Museum)
+            {
+                museumCount++;
+            }
+        }
+
         foreach (KeyValuePair<GameObject, Person> person in population.personDictionary)
         {
             if (!person.Value.isTired)
@@ -119,5 +137,7 @@ public class GameManagement : MonoBehaviour
         }
 
         prosperitySlider.value -= population.GetNumberOfDeadPeople(); // Remove one per death
+        prosperitySlider.value += 2 * libraryCount;
+        prosperitySlider.value += 3 * museumCount;
     }
 }

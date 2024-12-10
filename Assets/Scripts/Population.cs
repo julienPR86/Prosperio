@@ -301,10 +301,23 @@ public class Population : MonoBehaviour
             }
         }
 
+        if (houses.Count == 0)
+        {
+            foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+            {
+                if (person.Value.job != Job.Wanderer)
+                {
+                    person.Value.isTired = true;
+                    popupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
+                }
+            }
+            return; // Exit early since there are no houses
+        }
+
         foreach (KeyValuePair<GameObject, Person> person in personDictionary) // Placing every person to a house if this one is not full, else, the person will be tired
         {
             if (person.Value.job != Job.Wanderer)
-            {
+            { 
                 if (houses.Count > 0 || houses[i] != null)
                 {
                     if (!houses[i].isFull)
@@ -349,7 +362,10 @@ public class Population : MonoBehaviour
             numberOfDeadToday++;
         }
 
-        popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of hunger.");
+        if (peopleToRemove.Count > 0) 
+        {
+            popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of hunger.");
+        }
 
         UpdateText();
     }
@@ -380,7 +396,10 @@ public class Population : MonoBehaviour
             numberOfDeadToday++;
         }
 
-        popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of age.");
+        if (peopleToRemove.Count > 0)
+        {
+            popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of age.");
+        }
         UpdateText();
     }
 
