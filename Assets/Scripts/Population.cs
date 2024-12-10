@@ -315,8 +315,6 @@ public class Population : MonoBehaviour
             }
         }
 
-        Debug.Log("Build count: " + houses.Count);
-
         if (houses.Count == 0)
         {
             foreach (KeyValuePair<GameObject, Person> person in personDictionary)

@@ -265,7 +265,6 @@ public class BuildingSystem : MonoBehaviour
                     // Save building in cell
                     Cell curCell = gridManager.cells[building.position.x, building.position.y];
                     curCell.buildingInCell = building.buildingType;
-                    Debug.Log(curCell.buildingInCell);
 
                     // Set the tile on ground tilemap
                     buildingTilemap.SetTile(building.position, building.finalTile);
