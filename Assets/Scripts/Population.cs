@@ -59,6 +59,10 @@ public class Population : MonoBehaviour
         unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f);
         unitPanel.SetActive(true);
 
+        TogglePanelControl toggleControl = personObject.AddComponent<TogglePanelControl>();
+        toggleControl.targetToggle = toggle;
+        toggleControl.panelToControl = unitPanel;
+
         // toggle navigation to none
         toggleImage.sprite = circleSprite;
         toggle.navigation = new Navigation { mode = Navigation.Mode.None };
