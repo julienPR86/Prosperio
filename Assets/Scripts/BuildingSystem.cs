@@ -27,7 +27,7 @@ public class BuildingSystem : MonoBehaviour
     //building in progress tile
     [SerializeField] RuleTile buildingInProgressTile;
     //building cost data
-    [SerializeField] BuildingCostData farmCostData, homeCostData, schoolCostData, libraryCostData, museumCostData;
+    public BuildingCostData farmCostData, homeCostData, schoolCostData, libraryCostData, museumCostData;
 
     //Selected building tile and type
     RuleTile curBuildingTile;
@@ -123,12 +123,6 @@ public class BuildingSystem : MonoBehaviour
             }
         }
 
-        //---------------------  Input for tests
-        if (Input.GetKeyDown(KeyCode.B))
-        {
-            InitBuilding(BuildingType.Farm);
-        }
-        //---------------------
     }
 
 

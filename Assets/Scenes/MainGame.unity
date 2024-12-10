@@ -1839,7 +1839,6 @@ GameObject:
   - component: {fileID: 763929042}
   - component: {fileID: 763929043}
   - component: {fileID: 763929044}
-  - component: {fileID: 763929045}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1910,7 +1909,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PopupManager: {fileID: 1689287520}
   circleSprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  populationFolder: {fileID: 341978085}
+  populationFolder: {fileID: 0}
   harvesterText: {fileID: 2003006664}
   lumberjackText: {fileID: 802812983}
   diggerText: {fileID: 1665429127}
@@ -1976,21 +1975,6 @@ MonoBehaviour:
   buildSchoolButton: {fileID: 1061252323}
   buildLibraryButton: {fileID: 1871306827}
   buildMuseumButton: {fileID: 634515996}
---- !u!114 &763929045
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 763929038}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b14bdbc30c0c0de4c9625bdf65d00e44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  popupManager: {fileID: 1689287520}
-  pauseButton: {fileID: 2080923558}
-  prosperitySlider: {fileID: 1909097039}
 --- !u!1 &802812981
 GameObject:
   m_ObjectHideFlags: 0

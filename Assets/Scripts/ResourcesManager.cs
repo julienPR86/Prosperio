@@ -14,12 +14,13 @@ public class ResourcesManager : MonoBehaviour
     [SerializeField] private int foodCount = 10;
     [SerializeField] private int builderCount = 5;
 
-    [SerializeField] private BuildingCostData homeCostData;
-    [SerializeField] private BuildingCostData farmCostData;
-    [SerializeField] private BuildingCostData schoolCostData;
-    [SerializeField] private BuildingCostData libraryCostData;
-    [SerializeField] private BuildingCostData museumCostData;
+    private BuildingCostData homeCostData;
+    private BuildingCostData farmCostData;
+    private BuildingCostData schoolCostData;
+    private BuildingCostData libraryCostData;
+    private BuildingCostData museumCostData;
 
+    BuildingSystem buildingSystem;
 
     public TextMeshProUGUI foodText;
     public TextMeshProUGUI woodText;
@@ -31,6 +32,17 @@ public class ResourcesManager : MonoBehaviour
     public Button buildSchoolButton;
     public Button buildLibraryButton;
     public Button buildMuseumButton;
+
+    private void Awake()
+    {
+        buildingSystem = GetComponent<BuildingSystem>();
+
+        homeCostData = buildingSystem.homeCostData;
+        farmCostData = buildingSystem.farmCostData;
+        schoolCostData = buildingSystem.schoolCostData;
+        libraryCostData = buildingSystem.libraryCostData;
+        museumCostData = buildingSystem.museumCostData;
+    }
 
     /// <summary>
     /// Will be used to update Building UI, at the end of day(after gathering) AND after building
