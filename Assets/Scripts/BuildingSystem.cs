@@ -104,7 +104,7 @@ public class BuildingSystem : MonoBehaviour
                     //Set building in progress tile (to remember to player that a building is in progress at this position)
                     buildingTilemap.SetTile(curMouseGridPosition, buildingInProgressTile);
 
-                    BuildingInProgress curBuilding = new BuildingInProgress(curMouseGridPosition, curBuildingTile, curBuildingCostData.buildingTime, clock.day);
+                    BuildingInProgress curBuilding = new BuildingInProgress(curMouseGridPosition, curBuildingTile, curBuildingCostData.buildingTime, clock.day, curBuildingType);
                     buildingsInProgress.Add(curBuilding);
 
                     //Leave the preview mode
@@ -252,24 +252,36 @@ public class BuildingSystem : MonoBehaviour
     public void UpdateBuildingsInProgress()
     {
         int curDay = clock.day;
+        List<BuildingInProgress> completedBuildings = new List<BuildingInProgress>();
 
-        foreach (BuildingInProgress building in buildingsInProgress)
+        if (buildingsInProgress.Count != 0)
         {
-            if (curDay >= building.startDay + building.constructionTime)
+            foreach (BuildingInProgress building in buildingsInProgress)
             {
-                //Complete building
+                if (curDay >= building.startDay + building.constructionTime)
+                {
+                    // Complete building
 
-                //save building in cell
-                Cell curCell = gridManager.cells[building.position.x, building.position.y];
-                curCell.buildingInCell = curBuildingType;
+                    // Save building in cell
+                    Cell curCell = gridManager.cells[building.position.x, building.position.y];
+                    curCell.buildingInCell = building.buildingType;
+                    Debug.Log(curCell.buildingInCell);
 
-                //Set the tile on ground tilemap
-                buildingTilemap.SetTile(building.position, building.finalTile);
+                    // Set the tile on ground tilemap
+                    buildingTilemap.SetTile(building.position, building.finalTile);
 
-                buildingsInProgress.Remove(building);
+                    completedBuildings.Add(building);
+                }
+            }
+
+            // Remove completed buildings after the iteration
+            foreach (BuildingInProgress completedBuilding in completedBuildings)
+            {
+                buildingsInProgress.Remove(completedBuilding);
             }
         }
     }
+
 
     /// <summary>
     /// Class that represent building in progress
@@ -280,13 +292,15 @@ public class BuildingSystem : MonoBehaviour
         public RuleTile finalTile;
         public int startDay;
         public int constructionTime;
+        public BuildingType buildingType;
 
-        public BuildingInProgress(Vector3Int _position, RuleTile _finalTile, int _constructionTime, int _startDay)
+        public BuildingInProgress(Vector3Int _position, RuleTile _finalTile, int _constructionTime, int _startDay, BuildingType buildingType)
         {
             this.position = _position;
             this.finalTile = _finalTile;
             this.constructionTime = _constructionTime;
             this.startDay = _startDay;
+            this.buildingType = buildingType;
         }
     }
 }
