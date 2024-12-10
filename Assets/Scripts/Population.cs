@@ -100,15 +100,16 @@ public class Population : MonoBehaviour
         Person person = null;
 
         GameObject unitPanel = Instantiate(unitPanelPrefab, personobject.transform);
-        unitPanel.GetComponent<RectTransform>().anchoredPosition = new Vector2(6f, 0f); // Position relative au parent
-        unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f); // Taille relative au parent
+        unitPanel.GetComponent<RectTransform>().anchoredPosition = new Vector2(6f, 0f);
+        unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f);
+        unitPanel.SetActive(true);
 
         // toggle navigation to none
         toggleImage.sprite = circleSprite;
         toggle.navigation = new Navigation { mode = Navigation.Mode.None };
         toggle.image = toggleImage;
         toggle.group = toggleGroupObject.GetComponent<ToggleGroup>();
-        toggle.onValueChanged.AddListener(OnToggleValueChanged);
+        toggle.onValueChanged.AddListener(isOn => OnToggleValueChanged(unitPanel, isOn));
 
         switch (job)
         {
@@ -141,14 +142,14 @@ public class Population : MonoBehaviour
 
         personDictionary.Add(personobject, person);
         UpdateText();
+
     }
 
-    private void OnToggleValueChanged(bool isOn)
+    private void OnToggleValueChanged(GameObject unitPanel, bool isOn)
     {
-        // Afficher ou cacher le panel en fonction de l'état du Toggle
-        if (unitPanelPrefab != null)
+        if (unitPanel != null)
         {
-            this.unitPanelPrefab.SetActive(isOn);
+            unitPanel.SetActive(isOn);
         }
         else
         {
@@ -450,11 +451,11 @@ public class Population : MonoBehaviour
 
     private void UpdateText()
     {
-        harvestertext.text = stock.transform.Find("Harvesters").transform.childCount.ToString();
-        lumberjacktext.text = stock.transform.Find("Lumberjacks").transform.childCount.ToString();
-        diggertext.text = stock.transform.Find("Diggers").transform.childCount.ToString();
-        masontext.text = stock.transform.Find("Masons").transform.childCount.ToString();
-        wanderertext.text = stock.transform.Find("Wanderers").transform.childCount.ToString();
+        harvestertext.text = stock.transform.Find("Harvesters").childCount.ToString();
+        lumberjacktext.text = stock.transform.Find("Lumberjacks").childCount.ToString();
+        diggertext.text = stock.transform.Find("Diggers").childCount.ToString();
+        masontext.text = stock.transform.Find("Masons").childCount.ToString();
+        wanderertext.text = stock.transform.Find("Wanderers").childCount.ToString();
     }
 
     private void PauseGame()
