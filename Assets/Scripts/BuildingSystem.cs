@@ -34,6 +34,8 @@ public class BuildingSystem : MonoBehaviour
     BuildingType curBuildingType;
     BuildingCostData curBuildingCostData;
 
+    public bool schoolBuilded;
+
     //preview mode or not
     private bool previewMode;
 
@@ -58,6 +60,7 @@ public class BuildingSystem : MonoBehaviour
         buildingsInProgress = new List<BuildingInProgress>();
 
         previewMode = false;
+        schoolBuilded = false;
     }
 
     void Update()
@@ -265,7 +268,8 @@ public class BuildingSystem : MonoBehaviour
                     // Save building in cell
                     Cell curCell = gridManager.cells[building.position.x, building.position.y];
                     curCell.buildingInCell = building.buildingType;
-                    Debug.Log(curCell.buildingInCell);
+
+                    if(building.buildingType == BuildingType.School) schoolBuilded = true;
 
                     // Set the tile on ground tilemap
                     buildingTilemap.SetTile(building.position, building.finalTile);

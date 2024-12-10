@@ -23,6 +23,9 @@ public class Population : MonoBehaviour
     // Link ALL the gameObjects (key) to an instance of Person class (Value)
     public Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
 
+    //Dictionary that contain all persons at school
+    public Dictionary<Person, Job> personAtSchool = new Dictionary<Person, Job>();
+
     // To update number of workers per category in the UI
     public TextMeshProUGUI harvesterText;
     public TextMeshProUGUI lumberjackText;
@@ -352,7 +355,7 @@ public class Population : MonoBehaviour
         {
             foreach (KeyValuePair<GameObject, Person> person in personDictionary)
             {
-                if (person.Value.job != Job.Wanderer)
+                if (person.Value.job != Job.Wanderer || person.Value.atSchool)
                 {
                     person.Value.isTired = true;
                     popupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
@@ -363,7 +366,7 @@ public class Population : MonoBehaviour
 
         foreach (KeyValuePair<GameObject, Person> person in personDictionary) // Placing every person to a house if this one is not full, else, the person will be tired
         {
-            if (person.Value.job != Job.Wanderer)
+            if (person.Value.job != Job.Wanderer || person.Value.atSchool)
             {
                 if (houses.Count > 0 || houses[i] != null)
                 {
@@ -483,5 +486,12 @@ public class Population : MonoBehaviour
     public void ResetDeadNumber()
     {
         numberOfDeadToday = 0;
+    }
+
+    //Méthod to send someone at school (with target job)
+    public void SendToSchool(Person person, Job job)
+    {
+        person.atSchool = true;
+        personAtSchool.Add(person, job);
     }
 }

@@ -64,6 +64,7 @@ public class GameManagement : MonoBehaviour
             //Update buildings in progress list
             if (buildingSystem != null)
             {
+                UpdatePersonAtSchool();
                 buildingSystem.UpdateBuildingsInProgress();
             }
 
@@ -146,6 +147,18 @@ public class GameManagement : MonoBehaviour
         prosperitySlider.value -= population.GetNumberOfDeadPeople(); // Remove one per death
         prosperitySlider.value += 2 * libraryCount;
         prosperitySlider.value += 3 * museumCount;
+    }
+
+    //Method that apply(update) job to person for each element of dictonary of person at school
+    private void UpdatePersonAtSchool()
+    {
+        //Check to update each element
+        foreach (KeyValuePair<Person, Job> element in population.personAtSchool)
+        {
+            element.Key.job = element.Value;
+            population.personAtSchool.Remove(element.Key);
+            element.Key.atSchool = false;
+        }
     }
 }
 
