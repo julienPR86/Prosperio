@@ -20,6 +20,10 @@ public class Population : MonoBehaviour
     public GameObject populationFolder; // Contains empty objects acting like folders to stock Wanderers, Lumberjacks etc gameobjects
     public GameObject unitPanelPrefab;
 
+    public TextMeshProUGUI ageText;
+    public TextMeshProUGUI jobText;
+    public TextMeshProUGUI isTiredText;
+    private Person Person2;
     // Link ALL the gameObjects (key) to an instance of Person class (Value)
     public Dictionary<GameObject, Person> personDictionary = new Dictionary<GameObject, Person>();
 
@@ -59,17 +63,19 @@ public class Population : MonoBehaviour
         unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f);
         unitPanel.SetActive(true);
 
-        TogglePanelControl toggleControl = personObject.AddComponent<TogglePanelControl>();
-        toggleControl.targetToggle = toggle;
-        toggleControl.panelToControl = unitPanel;
+        // Update the job, age, and fatigue texts
+        ageText = unitPanel.transform.Find("AgeText").GetComponent<TextMeshProUGUI>();
+        jobText = unitPanel.transform.Find("JobText").GetComponent<TextMeshProUGUI>();
+        isTiredText = unitPanel.transform.Find("IsTiredText").GetComponent<TextMeshProUGUI>();
 
-        // toggle navigation to none
+        // Toggle navigation to none
         toggleImage.sprite = circleSprite;
         toggle.navigation = new Navigation { mode = Navigation.Mode.None };
         toggle.image = toggleImage;
         toggle.group = toggleGroupObject.GetComponent<ToggleGroup>();
         toggle.onValueChanged.AddListener(isOn => OnToggleValueChanged(unitPanel, isOn));
 
+        // Assigning the job and updating texts
         switch (job)
         {
             case Job.Harvester:
@@ -99,9 +105,15 @@ public class Population : MonoBehaviour
                 break;
         }
 
+        // Update UI text elements
+        ageText.text = "Age: " + person.age;
+        jobText.text = "Job: " + person.job.ToString();
+        isTiredText.text = person.isTired ? "Tired" : "Not Tired";
+
         personDictionary.Add(personObject, person);
         UpdateText();
     }
+
 
     private void OnToggleValueChanged(GameObject unitPanel, bool isOn)
     {
@@ -111,7 +123,7 @@ public class Population : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("Panel non assigné, impossible de le manipuler!");
+            Debug.LogWarning("Panel not assigned, impossible to manipulate");
         }
     }
 
@@ -422,6 +434,11 @@ public class Population : MonoBehaviour
         foreach (KeyValuePair<GameObject, Person> person in personDictionary)
         {
             person.Value.age++;
+            var unitPanel = person.Key.transform.GetComponentInChildren<Transform>().Find("UnitPanelPrefab");
+            if (unitPanel != null)
+            {
+                unitPanel.transform.GetComponent<TextMeshProUGUI>().text = $"Age : {person.Value.age++}";
+            }
         }
     }
 
