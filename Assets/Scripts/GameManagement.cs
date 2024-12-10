@@ -107,7 +107,7 @@ public class GameManagement : MonoBehaviour
         population.CreateGameObject(Job.Wanderer);
     }
 
-    private void UpdateProsperity()
+    private void UpdateProsperity() // To update the prosperity
     {
         int museumCount = 0;
         int libraryCount = 0;
