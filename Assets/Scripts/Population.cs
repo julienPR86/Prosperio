@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using static Person;
@@ -27,6 +28,8 @@ public class Population : MonoBehaviour
     private PopupManager PopupManagerText;
     public Slider prosperityslider;
     private int numberofdeadday = 0;
+    public GameObject unitPanelPrefab;
+
 
     void Start()
     {
@@ -86,12 +89,26 @@ public class Population : MonoBehaviour
 
     private void CreateGameObject(Job job)
     {
+        GameObject toggleGroupObject = GameObject.Find("Population");
         GameObject personobject = new GameObject();
         personobject.transform.position = new Vector3(5, 5);
         personobject.transform.localScale = new Vector3(0.3f, 0.3f);
         SpriteRenderer spriteRenderer = personobject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = circleSprite;
+        Toggle toggle = personobject.AddComponent<Toggle>();
+        Image toggleImage = personobject.AddComponent<Image>();
         Person person = null;
+
+        GameObject unitPanel = Instantiate(unitPanelPrefab, personobject.transform);
+        unitPanel.GetComponent<RectTransform>().anchoredPosition = new Vector2(6f, 0f); // Position relative au parent
+        unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f); // Taille relative au parent
+
+        // toggle navigation to none
+        toggleImage.sprite = circleSprite;
+        toggle.navigation = new Navigation { mode = Navigation.Mode.None };
+        toggle.image = toggleImage;
+        toggle.group = toggleGroupObject.GetComponent<ToggleGroup>();
+        toggle.onValueChanged.AddListener(OnToggleValueChanged);
 
         switch (job)
         {
@@ -124,6 +141,19 @@ public class Population : MonoBehaviour
 
         personDictionary.Add(personobject, person);
         UpdateText();
+    }
+
+    private void OnToggleValueChanged(bool isOn)
+    {
+        // Afficher ou cacher le panel en fonction de l'état du Toggle
+        if (unitPanelPrefab != null)
+        {
+            this.unitPanelPrefab.SetActive(isOn);
+        }
+        else
+        {
+            Debug.LogWarning("Panel non assigné, impossible de le manipuler!");
+        }
     }
 
     private void GoToWork(Job job)
