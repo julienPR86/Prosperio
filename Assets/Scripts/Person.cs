@@ -7,6 +7,7 @@ public class Person
     public int age { get; set; }
     public Job job {  get; set; }
     public bool isTired { get; set; }
+    public GameObject unitpanel;
 
     public Person(Job job = Job.Wanderer, int age = 1, bool isTired = false)
     {

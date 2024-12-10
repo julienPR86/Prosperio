@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
@@ -32,7 +33,13 @@ public class Population : MonoBehaviour
 
     public bool isWorking = false;
     public bool isTimerStopped = false;
-    private int numberOfDeadToday = 0;
+    public Button PauseButton;
+    public GameObject PopupManager;
+    private PopupManager PopupManagerText;
+    public Slider prosperityslider;
+    private int numberofdeadday = 0;
+    public GameObject unitPanelPrefab;
+
 
     void Start()
     {
@@ -44,12 +51,64 @@ public class Population : MonoBehaviour
 
     public void CreateGameObject(Job job)
     {
-        GameObject personObject = new GameObject();
-        personObject.transform.position = new Vector3(5, 5);
-        personObject.transform.localScale = new Vector3(0.3f, 0.3f);
-        SpriteRenderer spriteRenderer = personObject.AddComponent<SpriteRenderer>();
+        if (clock.GetTime() == 360 && !isWorking)
+        {
+            PopupManagerText.SetPopupText(2, "Workers go to work!");
+            isWorking = true;
+            StopAllCoroutines();
+            GoToWork(Job.Harvester);
+            GoToWork(Job.Lumberjack);
+            GoToWork(Job.Digger);
+            StartWalkingAround();
+        }
+        if (clock.GetTime() == 0 && isWorking)
+        {
+            PopupManagerText.SetPopupText(2, "Workers go to sleep!");
+            isWorking = false;
+            StopAllCoroutines();
+            DaysPassed++;
+            if (DaysPassed == 2) // Spawn of wanderers every 2 days.
+            {
+                DaysPassed = 0;
+                CreateGameObject(Job.Wanderer);
+                CreateGameObject(Job.Wanderer);
+                PopupManagerText.SetPopupText(1, "2 Wanderers appeared!");
+            }
+            //GoToHouse();
+            EatingTime();
+            AddAge();
+            DyingBecauseOfAge();
+            UpdateProsperity();
+        }
+    }
+    private void SpawnPerson(Person persontospawn)
+    {
+        CreateGameObject(persontospawn.job);
+    }
+
+    private void CreateGameObject(Job job)
+    {
+        GameObject toggleGroupObject = GameObject.Find("Population");
+        GameObject personobject = new GameObject();
+        personobject.transform.position = new Vector3(5, 5);
+        personobject.transform.localScale = new Vector3(0.3f, 0.3f);
+        SpriteRenderer spriteRenderer = personobject.AddComponent<SpriteRenderer>();
         spriteRenderer.sprite = circleSprite;
+        Toggle toggle = personobject.AddComponent<Toggle>();
+        Image toggleImage = personobject.AddComponent<Image>();
         Person person = null;
+
+        GameObject unitPanel = Instantiate(unitPanelPrefab, personobject.transform);
+        unitPanel.GetComponent<RectTransform>().anchoredPosition = new Vector2(6f, 0f);
+        unitPanel.GetComponent<RectTransform>().localScale = new Vector3(0.005f, 0.005f, 0.005f);
+        unitPanel.SetActive(true);
+
+        // toggle navigation to none
+        toggleImage.sprite = circleSprite;
+        toggle.navigation = new Navigation { mode = Navigation.Mode.None };
+        toggle.image = toggleImage;
+        toggle.group = toggleGroupObject.GetComponent<ToggleGroup>();
+        toggle.onValueChanged.AddListener(isOn => OnToggleValueChanged(unitPanel, isOn));
 
         switch (job)
         {
@@ -82,6 +141,19 @@ public class Population : MonoBehaviour
 
         personDictionary.Add(personObject, person);
         UpdateText();
+
+    }
+
+    private void OnToggleValueChanged(GameObject unitPanel, bool isOn)
+    {
+        if (unitPanel != null)
+        {
+            unitPanel.SetActive(isOn);
+        }
+        else
+        {
+            Debug.LogWarning("Panel non assign�, impossible de le manipuler!");
+        }
     }
 
     public void GoToWork(Job job)
