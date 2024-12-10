@@ -231,7 +231,7 @@ public class Population : MonoBehaviour
                 switch (job)
                 {
                     case Job.Harvester:
-                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester));
+                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester) * Mathf.Max(1, GetNumberOfFarms()));
                         break;
                     case Job.Lumberjack:
                         resourcesManager.AddWood(1 * GetActiveWorkers(Job.Lumberjack));
@@ -244,6 +244,20 @@ public class Population : MonoBehaviour
 
             yield return null; // Wait until the next frame
         }
+    }
+
+    private int GetNumberOfFarms() // Return the number of farms
+    {
+        int numberOfFarms = 0;
+        foreach (Cell cell in gridManager.cells)
+        {
+            if (cell.buildingInCell == Cell.BuildingType.Farm)
+            {
+                numberOfFarms++;
+            }
+        }
+
+        return numberOfFarms;
     }
 
 
@@ -301,6 +315,19 @@ public class Population : MonoBehaviour
             }
         }
 
+        if (houses.Count == 0)
+        {
+            foreach (KeyValuePair<GameObject, Person> person in personDictionary)
+            {
+                if (person.Value.job != Job.Wanderer)
+                {
+                    person.Value.isTired = true;
+                    popupManagerText.SetPopupText(0, "Couldn't sleep: House missing");
+                }
+            }
+            return; // Exit early since there are no houses
+        }
+
         foreach (KeyValuePair<GameObject, Person> person in personDictionary) // Placing every person to a house if this one is not full, else, the person will be tired
         {
             if (person.Value.job != Job.Wanderer)
@@ -349,7 +376,10 @@ public class Population : MonoBehaviour
             numberOfDeadToday++;
         }
 
-        popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of hunger.");
+        if (peopleToRemove.Count > 0)
+        {
+            popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of hunger.");
+        }
 
         UpdateText();
     }
@@ -380,7 +410,10 @@ public class Population : MonoBehaviour
             numberOfDeadToday++;
         }
 
-        popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of age.");
+        if (peopleToRemove.Count > 0)
+        {
+            popupManagerText.SetPopupText(0, $"{peopleToRemove.Count} people died of age.");
+        }
         UpdateText();
     }
 
@@ -395,7 +428,7 @@ public class Population : MonoBehaviour
 
     public void PauseGame()
     {
-        if (!isTimerStopped) 
+        if (!isTimerStopped)
         {
             clock.PauseGameClock();
             isTimerStopped = true;

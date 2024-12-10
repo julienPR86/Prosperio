@@ -13,6 +13,7 @@ public class GameManagement : MonoBehaviour
     private ResourcesManager resourcesManager;
     private BuildingSystem buildingSystem;
     private PopupManager popupManagerText;
+    private GridManager gridManager;
 
     // GameObjects needed
     public GameObject popupManager; // that contains PopupManager Script
@@ -20,7 +21,6 @@ public class GameManagement : MonoBehaviour
     // Times (in minutes) when they work/sleep.
     private int workTime = 360;
     private int sleepTime = 0;
-
 
     private int daysPassed = 0; // Useful to spawn 2 wanderers every two days
 
@@ -39,6 +39,7 @@ public class GameManagement : MonoBehaviour
         population = GetComponent<Population>();
         popupManagerText = popupManager.GetComponent<PopupManager>();
         buildingSystem = GetComponent<BuildingSystem>();
+        gridManager = GetComponent<GridManager>();
 
         // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
         population.CreateGameObject(Job.Wanderer);
@@ -57,13 +58,13 @@ public class GameManagement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (clock.GetTime() == workTime && !isWorking) 
+        if (clock.GetTime() == workTime && !isWorking)
         {
             //Update buildings in progress list
-            if (buildingSystem != null) 
+            if (buildingSystem != null)
             {
                 buildingSystem.UpdateBuildingsInProgress();
-            } 
+            }
 
             popupManagerText.SetPopupText(2, "Workers go to work!");
             population.ResetDeadNumber();
@@ -87,7 +88,7 @@ public class GameManagement : MonoBehaviour
             isWorking = false;
             population.isWorking = isWorking;
 
-            population.StopAllCoroutines(); 
+            population.StopAllCoroutines();
 
             daysPassed++;
             if (daysPassed == 2) // Spawn of wanderers every 2 days.
@@ -114,6 +115,21 @@ public class GameManagement : MonoBehaviour
 
     private void UpdateProsperity()
     {
+        int museumCount = 0;
+        int libraryCount = 0;
+
+        foreach (Cell cell in gridManager.cells)
+        {
+            if (cell.buildingInCell == Cell.BuildingType.Library)
+            {
+                libraryCount++;
+            }
+            if (cell.buildingInCell == Cell.BuildingType.Museum)
+            {
+                museumCount++;
+            }
+        }
+
         foreach (KeyValuePair<GameObject, Person> person in population.personDictionary)
         {
             if (!person.Value.isTired)
@@ -127,5 +143,8 @@ public class GameManagement : MonoBehaviour
         }
 
         prosperitySlider.value -= population.GetNumberOfDeadPeople(); // Remove one per death
+        prosperitySlider.value += 2 * libraryCount;
+        prosperitySlider.value += 3 * museumCount;
     }
 }
+
