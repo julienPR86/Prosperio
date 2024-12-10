@@ -336,11 +336,13 @@ public class Population : MonoBehaviour
         List<Cell> houses = new List<Cell>();
         foreach (Cell cell in gridManager.cells)  // Storing all the cells that are House.
         {
-            if (cell.buildingInCell == Cell.BuildingType.School)
+            if (cell.buildingInCell == Cell.BuildingType.Home)
             {
                 houses.Add(cell);
             }
         }
+
+        Debug.Log("Build count: " + houses.Count);
 
         if (houses.Count == 0)
         {
