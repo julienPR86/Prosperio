@@ -4,30 +4,30 @@ using UnityEngine.EventSystems;
 
 public class TogglePanelControl : MonoBehaviour, IPointerDownHandler
 {
-    public Toggle targetToggle;  // Le Toggle qui contrôle la visibilité du Panel
-    public GameObject panelToControl; // Le Panel à contrôler
+    public Toggle targetToggle;  // The Toggle that controls the visibility of the Panel
+    public GameObject panelToControl; // The Panel to control
 
     private bool isPanelVisible = false;
 
     void Start()
     {
-        // Initialisation du Panel en fonction de l'état du Toggle
+        // Initialize the Panel based on the state of the Toggle
         panelToControl.SetActive(targetToggle.isOn);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        // Si on clique en dehors du Toggle et du Panel, on désactive le Toggle et le Panel
+        // If clicking outside the Toggle and the Panel, deactivate the Toggle and the Panel
         if (!IsPointerOverUIElement(targetToggle.gameObject) && !IsPointerOverUIElement(panelToControl))
         {
-            targetToggle.isOn = false; // Désactive le Toggle
-            panelToControl.SetActive(false); // Désactive le Panel
+            targetToggle.isOn = false; // Deactivate the Toggle
+            panelToControl.SetActive(false); // Deactivate the Panel
         }
     }
 
     void Update()
     {
-        // Met à jour la visibilité du Panel en fonction de l'état du Toggle
+        // Update the visibility of the Panel based on the state of the Toggle
         if (targetToggle.isOn != isPanelVisible)
         {
             isPanelVisible = targetToggle.isOn;
@@ -35,7 +35,7 @@ public class TogglePanelControl : MonoBehaviour, IPointerDownHandler
         }
     }
 
-    // Vérifie si le pointeur (clic) est sur un élément UI
+    // Check if the pointer (click) is over a UI element
     bool IsPointerOverUIElement(GameObject uiElement)
     {
         RectTransform rectTransform = uiElement.GetComponent<RectTransform>();
