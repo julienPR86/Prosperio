@@ -11,6 +11,7 @@ public class GameManagement : MonoBehaviour
     private ManageClock clock;
     private Population population;
     private ResourcesManager resourcesManager;
+    private BuildingSystem buildingSystem;
     private PopupManager popupManagerText;
 
     // GameObjects needed
@@ -37,6 +38,7 @@ public class GameManagement : MonoBehaviour
         resourcesManager = GetComponent<ResourcesManager>();
         population = GetComponent<Population>();
         popupManagerText = popupManager.GetComponent<PopupManager>();
+        buildingSystem = GetComponent<BuildingSystem>();
 
         // Beginning: 2 wanderers + 1 harvester + 1 lumberjack + 1 digger + 1 mason
         population.CreateGameObject(Job.Wanderer);
@@ -57,6 +59,12 @@ public class GameManagement : MonoBehaviour
     {
         if (clock.GetTime() == workTime && !isWorking) 
         {
+            //Update buildings in progress list
+            if (buildingSystem != null) 
+            {
+                buildingSystem.UpdateBuildingsInProgress();
+            } 
+
             popupManagerText.SetPopupText(2, "Workers go to work!");
             population.ResetDeadNumber();
 
