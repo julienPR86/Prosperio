@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Resources;
 using TMPro.Examples;
-using UnityEditor.MPE;
 using UnityEngine;
 using UnityEngine.UI;
 using static Person;
@@ -21,8 +20,6 @@ public class GameManagement : MonoBehaviour
     // Times (in minutes) when they work/sleep.
     private int workTime = 360;
     private int sleepTime = 0;
-
-
     private int daysPassed = 0; // Useful to spawn 2 wanderers every two days
 
     // Some booleans to avoid functions in update being called multiple times
