@@ -1910,11 +1910,11 @@ MonoBehaviour:
   PopupManager: {fileID: 1689287520}
   circleSprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
   populationFolder: {fileID: 0}
-  harvesterText: {fileID: 0}
-  lumberjackText: {fileID: 0}
-  diggerText: {fileID: 0}
-  wandererText: {fileID: 0}
-  masonText: {fileID: 0}
+  harvesterText: {fileID: 2003006664}
+  lumberjackText: {fileID: 802812983}
+  diggerText: {fileID: 1665429127}
+  wandererText: {fileID: 1171890003}
+  masonText: {fileID: 472181044}
   isWorking: 0
   isTimerStopped: 0
 --- !u!114 &763929043
