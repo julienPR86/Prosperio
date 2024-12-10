@@ -303,7 +303,7 @@ public class Population : MonoBehaviour
                 switch (job)
                 {
                     case Job.Harvester:
-                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester));
+                        resourcesManager.AddFood(1 * GetActiveWorkers(Job.Harvester) * Mathf.Max(1, GetNumberOfFarms()));
                         break;
                     case Job.Lumberjack:
                         resourcesManager.AddWood(1 * GetActiveWorkers(Job.Lumberjack));
@@ -316,6 +316,20 @@ public class Population : MonoBehaviour
 
             yield return null; // Wait until the next frame
         }
+    }
+
+    private int GetNumberOfFarms() // Return the number of farms
+    {
+        int numberOfFarms = 0;
+        foreach (Cell cell in gridManager.cells)
+        {
+            if (cell.buildingInCell == Cell.BuildingType.Farm)
+            {
+                numberOfFarms++;
+            }
+        }
+
+        return numberOfFarms;
     }
 
 
