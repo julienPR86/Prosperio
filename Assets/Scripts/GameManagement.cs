@@ -22,6 +22,7 @@ public class GameManagement : MonoBehaviour
     private int workTime = 360;
     private int sleepTime = 0;
 
+
     private int daysPassed = 0; // Useful to spawn 2 wanderers every two days
 
     // Some booleans to avoid functions in update being called multiple times
